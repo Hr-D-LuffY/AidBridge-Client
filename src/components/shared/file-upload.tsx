@@ -2,7 +2,7 @@
 
 import { Film, ImagePlus, X } from 'lucide-react'
 import Image from 'next/image'
-import { type ChangeEvent, useId, useRef, useState } from 'react'
+import { type ChangeEvent, useId, useState } from 'react'
 import { UploadProgress } from '@/components/shared/upload-progress'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -10,6 +10,7 @@ import { useObjectUrl } from '@/hooks/use-object-url'
 import { MEDIA_ACCEPTED_TYPES, MEDIA_MAX_BYTES, MEDIA_MAX_FILES } from '@/lib/constants'
 import { formatFileSize } from '@/lib/format'
 import { checkMediaFiles, isVideo } from '@/lib/media'
+import { cn } from '@/lib/utils'
 
 type FileUploadProps = {
   label: string
@@ -92,7 +93,6 @@ export function FileUpload({
   disabled,
 }: FileUploadProps) {
   const inputId = useId()
-  const inputRef = useRef<HTMLInputElement>(null)
   const [problems, setProblems] = useState<string[]>([])
 
   const slotsLeft = Math.max(0, maxFiles - existingCount - files.length)
@@ -121,27 +121,29 @@ export function FileUpload({
       </Label>
 
       <div>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11 px-4"
-          disabled={disabled || uploading || slotsLeft === 0}
-          onClick={() => inputRef.current?.click()}
-        >
-          <ImagePlus aria-hidden="true" />
-          {files.length > 0 ? 'Add more' : 'Add photos or videos'}
-        </Button>
         <input
-          ref={inputRef}
           id={inputId}
           type="file"
           accept={ACCEPT}
           multiple
-          hidden
-          disabled={disabled || uploading}
+          disabled={disabled || uploading || slotsLeft === 0}
           aria-describedby={`${inputId}-hint`}
           onChange={handleChange}
+          className="peer sr-only"
         />
+        {/* The whole zone is the label, so a click anywhere opens the picker; keyboard focus lands on
+            the hidden input and shows as a ring on the zone. */}
+        <label
+          htmlFor={inputId}
+          className={cn(
+            'flex cursor-pointer flex-col items-center gap-1 rounded-xl border-2 border-dashed border-input bg-muted/40 px-4 py-6 text-center transition-colors peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:bg-muted peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+          )}
+        >
+          <ImagePlus aria-hidden="true" className="size-7 text-muted-foreground" />
+          <span className="text-sm font-medium">
+            {files.length > 0 ? 'Add more photos or videos' : 'Tap to choose photos or videos'}
+          </span>
+        </label>
       </div>
 
       {files.length > 0 && (

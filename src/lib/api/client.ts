@@ -13,7 +13,7 @@ const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'
 
 // The backend has no refresh token, so a 401 means the session is over (expired, password changed
 // somewhere else, account deleted). Send the user to log in again and bring them back here after.
-function redirectToLogin() {
+export function redirectToLogin() {
   if (typeof window === 'undefined') return
   const { pathname, search } = window.location
   if (AUTH_PAGES.some((page) => pathname.startsWith(page))) return

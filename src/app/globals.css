@@ -265,3 +265,94 @@
     padding-inline: 1.5rem;
   }
 }
+
+/* Leaflet maps (components/shared/location-map-canvas.tsx), kept inside the theme tokens. */
+.leaflet-container {
+  font-family: inherit;
+  background: var(--muted);
+}
+
+.map-pin {
+  color: var(--primary);
+  filter: drop-shadow(0 2px 3px color-mix(in oklch, var(--foreground) 35%, transparent));
+}
+
+/* The "view on map" button (features/sos/components/sos-location-panel.tsx): the pin bobs gently and
+   a soft ring pulses around the button, until the user opens the map. Reduced motion turns both off
+   (see the media query above), and the button stays fully usable. */
+@keyframes map-pin-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes map-button-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 10px color-mix(in oklch, var(--primary) 0%, transparent);
+  }
+}
+
+.map-icon-pin {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.map-button .map-icon-pin {
+  animation: map-pin-bob 1.8s ease-in-out infinite;
+}
+
+.map-button:hover .map-icon-pin,
+.map-button:focus-visible .map-icon-pin {
+  animation-duration: 0.7s;
+}
+
+.map-button[data-pulse="true"] {
+  animation: map-button-ring 2.4s ease-out infinite;
+}
+
+.accuracy-circle {
+  stroke: var(--info);
+  fill: var(--info);
+}
+
+.you-dot {
+  fill: var(--info);
+  stroke: var(--background);
+}
+
+.leaflet-container .map-tiles-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+
+.place-dot {
+  fill: var(--success);
+  stroke: var(--background);
+}
+
+.place-dot-warning {
+  fill: var(--warning);
+}
+
+.place-dot-info {
+  fill: var(--info);
+}
+
+.place-dot-high {
+  fill: var(--high);
+}
+
+.place-dot-danger {
+  fill: var(--destructive);
+}
+
+.place-dot-muted {
+  fill: var(--muted-foreground);
+}

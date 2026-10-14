@@ -21,3 +21,9 @@ export function fromGeoPoint(point: GeoPoint): LatLng {
   const [lng, lat] = point.coordinates
   return { lat, lng }
 }
+
+// Where the map opens before any position is known: all of Bangladesh.
+export const DEFAULT_MAP_CENTER: LatLng = { lat: 23.685, lng: 90.356 }
+export const DEFAULT_MAP_ZOOM = 7
+// Close enough to see streets, used once the user's position is known.
+export const LOCATED_MAP_ZOOM = 16

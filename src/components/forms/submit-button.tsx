@@ -3,16 +3,19 @@
 import { Loader2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { useFormContext } from './form-context'
 
 type SubmitButtonProps = {
   children: ReactNode
   // Extra reason to stay disabled, e.g. a login that succeeded and is now navigating away.
   disabled?: boolean
+  // For a button that needs another look, e.g. the red emergency one.
+  className?: string
 }
 
 // Full-width submit. Disabled and showing a spinner while the form submits, so it cannot be sent twice.
-export function SubmitButton({ children, disabled = false }: SubmitButtonProps) {
+export function SubmitButton({ children, disabled = false, className }: SubmitButtonProps) {
   const form = useFormContext()
 
   return (
@@ -21,7 +24,7 @@ export function SubmitButton({ children, disabled = false }: SubmitButtonProps) 
         <Button
           type="submit"
           disabled={isSubmitting || disabled}
-          className="h-12 w-full rounded-xl text-base font-semibold"
+          className={cn('h-12 w-full rounded-xl text-base font-semibold', className)}
         >
           {isSubmitting && <Loader2 className="animate-spin" aria-hidden="true" />}
           {children}

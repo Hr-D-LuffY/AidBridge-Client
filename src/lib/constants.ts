@@ -45,8 +45,21 @@ export const SEARCH_DEBOUNCE_MS = 400
 // The backend has no websockets, so these screens poll (see hooks/use-polling.ts).
 export const POLL_INTERVAL_MS = {
   chat: 5_000,
+  sosStatus: 15_000,
   notifications: 30_000,
 } as const
+
+// SOS field rules and limits (backend: constants/sos.ts, volunteer-request.interface.ts).
+export const SOS_DESCRIPTION_MAX_LENGTH = 1000
+export const SOS_ADDRESS_MAX_LENGTH = 300
+export const SOS_RESOLVE_REASON_MAX_LENGTH = 500
+export const MAX_ACTIVE_SOS = 3
+export const VOLUNTEER_REQUEST_MIN_LENGTH = 10
+export const VOLUNTEER_REQUEST_MAX_LENGTH = 500
+
+// Nearby camps: the backend caps the radius at 50 km.
+export const CAMP_RADIUS_OPTIONS_KM = [5, 10, 25, 50] as const
+export const DEFAULT_CAMP_RADIUS_KM = 10
 
 // SOS media rules (backend: constants/sos.ts). Checked in the browser first so a bad file is
 // refused before the upload starts.

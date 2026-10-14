@@ -15,6 +15,7 @@ type TextFieldProps = {
   // Picks the mobile keyboard (a number pad for an amount) without the quirks of type="number".
   inputMode?: 'text' | 'numeric' | 'decimal'
   icon?: LucideIcon
+  maxLength?: number
   optional?: boolean
   hint?: string
 }
@@ -27,6 +28,7 @@ export function TextField({
   autoComplete,
   inputMode,
   icon: Icon,
+  maxLength,
   optional,
   hint,
 }: TextFieldProps) {
@@ -51,6 +53,7 @@ export function TextField({
           placeholder={placeholder}
           autoComplete={autoComplete}
           inputMode={inputMode}
+          maxLength={maxLength}
           onBlur={field.handleBlur}
           onChange={(event) => field.handleChange(event.target.value)}
           aria-invalid={error ? true : undefined}

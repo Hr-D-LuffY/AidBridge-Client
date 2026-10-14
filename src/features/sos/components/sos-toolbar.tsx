@@ -1,0 +1,221 @@
+'use client'
+
+import { FilterX, ListFilter, Search, X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { FilterChips } from '@/components/shared/filter-chips'
+import { RELIEF_CATEGORY_OPTIONS } from '@/components/shared/relief-category'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import type { useQueryParams } from '@/hooks/use-query-params'
+import { SEARCH_DEBOUNCE_MS } from '@/lib/constants'
+import { cn } from '@/lib/utils'
+import { Priority, SosStatus } from '@/types'
+import {
+  countActiveFilters,
+  OPEN_FILTER,
+  SOS_SORT_LABEL,
+  SosSort,
+  type SosStatusFilter,
+  type SosViewParams,
+} from '../sos.params'
+
+const STATUS_OPTIONS: readonly { value: SosStatusFilter; label: string }[] = [
+  { value: OPEN_FILTER, label: 'Open now' },
+  { value: SosStatus.PENDING, label: 'Waiting' },
+  { value: SosStatus.ASSIGNED, label: 'Assigned' },
+  { value: SosStatus.ON_THE_WAY, label: 'On the way' },
+  { value: SosStatus.RESCUED, label: 'Rescued' },
+  { value: SosStatus.CLOSED, label: 'Closed' },
+]
+
+const PRIORITY_OPTIONS = [
+  { value: Priority.CRITICAL, label: 'Critical' },
+  { value: Priority.HIGH, label: 'High' },
+  { value: Priority.MEDIUM, label: 'Medium' },
+  { value: Priority.LOW, label: 'Low' },
+] as const
+
+const SORT_OPTIONS = Object.values(SosSort)
+
+type SosToolbarProps = {
+  view: SosViewParams
+  params: ReturnType<typeof useQueryParams>
+}
+
+// Search, sort and filters for "My requests". Everything is written to the URL (?q=&sort=&status=&
+// priority=&need=), so a refresh, the back button or a shared link shows the same list. Typing in the
+// search box updates the URL only after a pause, and changing any filter returns to page 1.
+export function SosToolbar({ view, params }: SosToolbarProps) {
+  const searchId = useId()
+  const sortId = useId()
+  const [search, setSearch] = useState(view.q)
+  // On a phone the chips are folded away behind a "Filters" button; from md up they are always shown.
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  function onSearchChange(value: string) {
+    setSearch(value)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => params.set({ q: value.trim() }), SEARCH_DEBOUNCE_MS)
+  }
+
+  function clearSearch() {
+    clearTimeout(timer.current)
+    setSearch('')
+    params.set({ q: undefined })
+  }
+
+  function clearAll() {
+    clearTimeout(timer.current)
+    setSearch('')
+    params.clear('status', 'priority', 'need', 'q')
+  }
+
+  const active = countActiveFilters(view)
+
+  // What is switched on, as removable chips: one tap takes a single filter off.
+  const chips: { key: string; label: string; onRemove: () => void }[] = []
+  const statusLabel = STATUS_OPTIONS.find((option) => option.value === view.status)?.label
+  if (statusLabel) {
+    chips.push({
+      key: 'status',
+      label: statusLabel,
+      onRemove: () => params.set({ status: undefined }),
+    })
+  }
+  const priorityLabel = PRIORITY_OPTIONS.find((option) => option.value === view.priority)?.label
+  if (priorityLabel) {
+    chips.push({
+      key: 'priority',
+      label: `${priorityLabel} priority`,
+      onRemove: () => params.set({ priority: undefined }),
+    })
+  }
+  const needLabel = RELIEF_CATEGORY_OPTIONS.find((option) => option.value === view.need)?.label
+  if (needLabel) {
+    chips.push({
+      key: 'need',
+      label: `Needs ${needLabel.toLowerCase()}`,
+      onRemove: () => params.set({ need: undefined }),
+    })
+  }
+  if (view.q) chips.push({ key: 'q', label: `"${view.q}"`, onRemove: clearSearch })
+
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border bg-card p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <label htmlFor={searchId} className="text-sm font-medium">
+            Search
+          </label>
+          <div className="relative">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              id={searchId}
+              type="search"
+              value={search}
+              maxLength={100}
+              placeholder="Address, details or volunteer name"
+              className="h-11 pr-10 pl-9 text-base md:text-sm"
+              onChange={(event) => onSearchChange(event.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute top-1/2 right-1 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-md text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <X aria-hidden="true" className="size-4" />
+                <span className="sr-only">Clear search</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5 sm:w-56">
+          <label htmlFor={sortId} className="text-sm font-medium">
+            Sort by
+          </label>
+          <select
+            id={sortId}
+            value={view.sort}
+            onChange={(event) => params.set({ sort: event.target.value })}
+            className="h-11 w-full cursor-pointer rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30 dark:[&>option]:bg-card"
+          >
+            {SORT_OPTIONS.map((sort) => (
+              <option key={sort} value={sort}>
+                {SOS_SORT_LABEL[sort]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          aria-expanded={filtersOpen}
+          className="h-11 gap-2 px-4 md:hidden"
+          onClick={() => setFiltersOpen((open) => !open)}
+        >
+          <ListFilter aria-hidden="true" />
+          Filters{active > 0 && ` (${active})`}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 gap-2 px-4"
+          disabled={active === 0}
+          onClick={clearAll}
+        >
+          <FilterX aria-hidden="true" />
+          Clear filters
+        </Button>
+      </div>
+
+      <div className={cn('flex-col gap-3', filtersOpen ? 'flex' : 'hidden md:flex')}>
+        <FilterChips
+          label="Status"
+          options={STATUS_OPTIONS}
+          value={view.status}
+          onChange={(status) => params.set({ status })}
+        />
+        <FilterChips
+          label="Priority"
+          options={PRIORITY_OPTIONS}
+          value={view.priority}
+          onChange={(priority) => params.set({ priority })}
+        />
+        <FilterChips
+          label="Needs"
+          options={RELIEF_CATEGORY_OPTIONS}
+          value={view.need}
+          onChange={(need) => params.set({ need })}
+        />
+      </div>
+
+      {chips.length > 0 && (
+        <ul aria-label="Active filters" className="flex flex-wrap items-center gap-2 border-t pt-3">
+          {chips.map((chip) => (
+            <li key={chip.key}>
+              <button
+                type="button"
+                onClick={chip.onRemove}
+                className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-primary/40 bg-sidebar-accent py-1 pr-2 pl-3 text-sm font-medium text-sidebar-accent-foreground outline-none transition-colors hover:bg-sidebar-accent/70 focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-11"
+              >
+                {chip.label}
+                <X aria-hidden="true" className="size-4" />
+                <span className="sr-only">Remove filter</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
