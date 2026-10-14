@@ -70,8 +70,10 @@ export function createApiClient({ baseURL, getHeaders }: ClientConfig) {
 
   async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResult<T>> {
     const method = options.method ?? 'GET'
+    // Outside the try on purpose: reading cookies() makes Next treat the page as dynamic by throwing
+    // a signal, and turning that into an ApiError would make the build prerender the page instead.
+    const authHeaders = getHeaders ? await getHeaders() : {}
     try {
-      const authHeaders = getHeaders ? await getHeaders() : {}
       const response = await http.raw<ApiResponse<T>>(path, {
         method,
         query: cleanQuery(options.query),
