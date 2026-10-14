@@ -16,7 +16,7 @@ export default function MySosLoading() {
         <Skeleton className="h-40 rounded-2xl" />
         <Skeleton className="h-5 w-32" />
         {['one', 'two', 'three'].map((id) => (
-          <Skeleton key={id} className="h-64 rounded-2xl" />
+          <Skeleton key={id} className="h-28 rounded-2xl" />
         ))}
       </div>
     </div>

@@ -29,13 +29,13 @@ export const loginSchema = z.object({
 export type LoginInput = z.input<typeof loginSchema>
 export type LoginPayload = z.output<typeof loginSchema>
 
-const nameField = z
+export const nameField = z
   .string()
   .trim()
   .min(NAME_MIN_LENGTH, `Name must be at least ${NAME_MIN_LENGTH} characters`)
   .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters`)
 
-const phoneField = z
+export const phoneField = z
   .string()
   .trim()
   .regex(PHONE_PATTERN, 'Phone must be 7-15 digits, optionally starting with +')

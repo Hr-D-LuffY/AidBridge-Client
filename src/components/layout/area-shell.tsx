@@ -5,6 +5,7 @@ import { type ReactNode, useState } from 'react'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { NotificationBell } from '@/features/notification/components/notification-bell'
 import { useSession } from '@/hooks/use-session'
 import { ROLE_LABEL } from '@/lib/constants'
 import { BrandLogo } from './brand-logo'
@@ -53,6 +54,7 @@ export function AreaShell({ children }: { children: ReactNode }) {
             <BrandLogo className="lg:hidden" />
           </div>
           <div className="flex items-center gap-2">
+            <NotificationBell />
             <ThemeToggle />
             <UserMenu />
           </div>

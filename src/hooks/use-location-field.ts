@@ -7,10 +7,11 @@ import type { LatLng } from '@/lib/geo'
 // 'gps': the browser's fix. 'pin': the user tapped or dragged the pin, which always wins over GPS.
 export type LocationSource = 'gps' | 'pin'
 
-// The position of an SOS: asks the browser for it as the screen opens (the form says why) and lets
-// the user correct it by placing the pin, so a blocked or weak GPS never stops a request.
-export function useLocationField() {
-  const geo = useGeolocation({ autoRequest: true })
+// A position the user chooses: asks the browser for it as the screen opens (the SOS form says why)
+// and lets the user correct it by placing the pin, so a blocked or weak GPS never stops a request.
+// A screen that should wait for a button press (the profile) passes `autoRequest: false`.
+export function useLocationField({ autoRequest = true }: { autoRequest?: boolean } = {}) {
+  const geo = useGeolocation({ autoRequest })
   const [pin, setPin] = useState<LatLng | null>(null)
 
   const position = pin ?? geo.position

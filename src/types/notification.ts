@@ -1,3 +1,5 @@
+import type { PaginationParams } from './api'
+
 export type AppNotification = {
   id: string
   title: string
@@ -5,4 +7,8 @@ export type AppNotification = {
   isEmergencyBroadcast: boolean
   isRead: boolean
   createdAt: string
+}
+
+export type NotificationListParams = PaginationParams & {
+  unread?: boolean
 }

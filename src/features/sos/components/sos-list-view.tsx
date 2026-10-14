@@ -134,7 +134,7 @@ function CardsSkeleton() {
     <div aria-busy="true" className="flex flex-col gap-4">
       <output className="sr-only">Loading your requests</output>
       {['one', 'two', 'three'].map((id) => (
-        <Skeleton key={id} className="h-64 rounded-2xl" />
+        <Skeleton key={id} className="h-28 rounded-2xl" />
       ))}
     </div>
   )

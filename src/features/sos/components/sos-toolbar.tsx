@@ -10,22 +10,16 @@ import type { useQueryParams } from '@/hooks/use-query-params'
 import { SEARCH_DEBOUNCE_MS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { Priority, SosStatus } from '@/types'
-import {
-  countActiveFilters,
-  OPEN_FILTER,
-  SOS_SORT_LABEL,
-  SosSort,
-  type SosStatusFilter,
-  type SosViewParams,
-} from '../sos.params'
+import { countActiveFilters, SOS_SORT_LABEL, SosSort, type SosViewParams } from '../sos.params'
+import { STATUS_SWATCH } from '../sos.surface'
 
-const STATUS_OPTIONS: readonly { value: SosStatusFilter; label: string }[] = [
-  { value: OPEN_FILTER, label: 'Open now' },
-  { value: SosStatus.PENDING, label: 'Waiting' },
-  { value: SosStatus.ASSIGNED, label: 'Assigned' },
-  { value: SosStatus.ON_THE_WAY, label: 'On the way' },
-  { value: SosStatus.RESCUED, label: 'Rescued' },
-  { value: SosStatus.CLOSED, label: 'Closed' },
+// Each status shows the colour its cards have in the list, so the colours explain themselves.
+const STATUS_OPTIONS: readonly { value: SosStatus; label: string; swatch: string }[] = [
+  { value: SosStatus.PENDING, label: 'Waiting', swatch: STATUS_SWATCH[SosStatus.PENDING] },
+  { value: SosStatus.ASSIGNED, label: 'Assigned', swatch: STATUS_SWATCH[SosStatus.ASSIGNED] },
+  { value: SosStatus.ON_THE_WAY, label: 'On the way', swatch: STATUS_SWATCH[SosStatus.ON_THE_WAY] },
+  { value: SosStatus.RESCUED, label: 'Rescued', swatch: STATUS_SWATCH[SosStatus.RESCUED] },
+  { value: SosStatus.CLOSED, label: 'Closed', swatch: STATUS_SWATCH[SosStatus.CLOSED] },
 ]
 
 const PRIORITY_OPTIONS = [

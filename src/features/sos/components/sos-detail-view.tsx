@@ -1,16 +1,18 @@
 'use client'
 
-import { Pencil, Phone, Siren, UserRound, XCircle } from 'lucide-react'
+import { MessageSquare, Pencil, Phone, Siren, UserRound, XCircle } from 'lucide-react'
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
+import { ChatPanel } from '@/features/message/components/chat-panel'
+import { RateVolunteer } from '@/features/task/components/rate-volunteer'
 import { usePolling } from '@/hooks/use-polling'
 import { POLL_INTERVAL_MS, SOS_RESOLVE_REASON_MAX_LENGTH } from '@/lib/constants'
 import { formatDateTime, formatRelativeTime } from '@/lib/format'
-import { ResolvedBy, type SosRequest } from '@/types'
+import { ResolvedBy, type SosRequest, TaskStatus } from '@/types'
 import { isSosFinished, useResolveSos, useSosQuery } from '../sos.queries'
 import { resolveReasonSchema } from '../sos.schema'
 import { EditSosSheet } from './edit-sos-sheet'
@@ -114,6 +116,36 @@ export function SosDetailView({ id }: SosDetailViewProps) {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="flex flex-col gap-4">
+          {sos.task?.status === TaskStatus.COMPLETED && (
+            <RateVolunteer
+              sosId={sos.id}
+              task={sos.task}
+              volunteerName={sos.assignedVolunteer?.name ?? 'your volunteer'}
+            />
+          )}
+
+          {/* Before a volunteer takes the request there is nobody to talk to, so a short note
+              stands in and nothing is fetched. Once someone has been on it, the conversation stays
+              readable after the request ends. */}
+          {sos.assignedVolunteer || !open ? (
+            <ChatPanel
+              sosId={sos.id}
+              live={Boolean(sos.assignedVolunteer) && open}
+              closedNote={
+                open
+                  ? 'Messages open when a volunteer takes your request.'
+                  : 'This request has ended, so the conversation is closed.'
+              }
+            />
+          ) : (
+            <Panel title="Messages">
+              <p className="flex items-start gap-2 text-sm text-muted-foreground">
+                <MessageSquare aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                You can write to the volunteer here as soon as one takes your request.
+              </p>
+            </Panel>
+          )}
+
           <Panel title="What you asked for">
             <ReliefBadges categories={sos.needs} />
             {sos.description ? (

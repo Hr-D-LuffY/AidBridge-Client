@@ -273,7 +273,7 @@
 }
 
 .map-pin {
-  color: var(--primary);
+  color: var(--info);
   filter: drop-shadow(0 2px 3px color-mix(in oklch, var(--foreground) 35%, transparent));
 }
 
@@ -292,11 +292,11 @@
 
 @keyframes map-button-ring {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 35%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--info) 35%, transparent);
   }
   70%,
   100% {
-    box-shadow: 0 0 0 10px color-mix(in oklch, var(--primary) 0%, transparent);
+    box-shadow: 0 0 0 10px color-mix(in oklch, var(--info) 0%, transparent);
   }
 }
 
@@ -332,27 +332,350 @@
   filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
 }
 
-.place-dot {
-  fill: var(--success);
-  stroke: var(--background);
+/* A place on the camp map: a round badge with a house, green when it has room and amber when full
+   (components/shared/places-map-canvas.tsx). It uses the fixed map palette, so it reads on the dark map. */
+.place-pin {
+  color: var(--cm-green);
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5));
 }
 
-.place-dot-warning {
-  fill: var(--warning);
+.place-pin svg {
+  transform-origin: 50% 94%;
+  transition: transform 0.15s ease;
 }
 
-.place-dot-info {
+.place-pin:hover svg {
+  transform: scale(1.14);
+}
+
+.place-pin-full {
+  color: var(--cm-amber);
+}
+
+/* The search radius drawn around "you". */
+.radius-circle {
+  stroke: var(--info);
   fill: var(--info);
 }
 
-.place-dot-high {
-  fill: var(--high);
+/* The classic look of the first AidBridge: a dark map, a dark info card on hover. The colours are fixed on
+   purpose (not theme tokens), so the card and the classic map read the same in the light and the dark theme.
+   Used by both maps (components/shared/places-map-canvas.tsx and classic-places-map-canvas.tsx). */
+:root {
+  --cm-bg: #0a0c0f;
+  --cm-surface: #111318;
+  --cm-surface-2: #181c23;
+  --cm-border: #2a2f3a;
+  --cm-muted: #8a93a3;
+  --cm-text-2: #a6afbf;
+  --cm-text: #eef0f4;
+  --cm-blue: #3498db;
+  --cm-green: #2ecc71;
+  --cm-amber: #f39c12;
+  --cm-red: #ff6b75;
+  --cm-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
-.place-dot-danger {
-  fill: var(--destructive);
+.classic-map {
+  background: var(--cm-bg);
+  border: 1px solid var(--cm-border);
 }
 
-.place-dot-muted {
-  fill: var(--muted-foreground);
+.classic-map .leaflet-container {
+  background: var(--cm-bg);
+  font-family: inherit;
+}
+
+.classic-you {
+  fill: var(--cm-blue);
+  fill-opacity: 0.92;
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+
+.classic-radius {
+  stroke: var(--cm-blue);
+  fill: var(--cm-blue);
+}
+
+/* The info card on hover. */
+.leaflet-tooltip.classic-tip {
+  padding: 0;
+  border: 1px solid var(--cm-border);
+  border-radius: 10px;
+  background: var(--cm-surface);
+  color: var(--cm-text);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+}
+
+.leaflet-tooltip-top.classic-tip::before {
+  border-top-color: var(--cm-border);
+}
+
+.classic-card {
+  box-sizing: border-box;
+  width: 15rem;
+  padding: 0.875rem;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.classic-card__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  color: var(--cm-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.classic-card__row:last-child {
+  margin-bottom: 0;
+}
+
+.classic-card__row > span:not(.classic-card__key, .classic-card__dot) {
+  min-width: 0;
+  flex: 1;
+}
+
+.classic-card__key {
+  min-width: 4.5rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+  color: var(--cm-muted);
+  font-family: var(--cm-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.classic-card__hint {
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--cm-border);
+  color: var(--cm-blue);
+  font-family: var(--cm-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-align: right;
+}
+
+.classic-card__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-top: 0.4rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.classic-card__dot-open {
+  background: var(--cm-green);
+}
+
+.classic-card__dot-full {
+  background: var(--cm-amber);
+}
+
+/* "YOU ARE HERE" */
+.leaflet-tooltip.classic-you-tip {
+  padding: 4px 10px;
+  border: 1px solid var(--cm-blue);
+  border-radius: 6px;
+  background: rgb(52 152 219 / 0.92);
+  color: #fff;
+  font-family: var(--cm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.classic-you-tip::before {
+  display: none;
+}
+
+.classic-legend {
+  position: absolute;
+  bottom: 4rem; /* above the credit (i) button of MapControls */
+  left: 0.75rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--cm-border);
+  border-radius: 8px;
+  background: rgb(10 12 15 / 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.classic-legend__title {
+  color: var(--cm-muted);
+  font-family: var(--cm-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.classic-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cm-text-2);
+  font-family: var(--cm-mono);
+  font-size: 0.72rem;
+}
+
+.classic-legend__dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.classic-legend__dot-you {
+  background: var(--cm-blue);
+}
+
+.classic-legend__dot-open {
+  background: var(--cm-green);
+}
+
+.classic-legend__dot-full {
+  background: var(--cm-amber);
+}
+
+.classic-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  max-width: 18rem;
+  padding: 1.25rem 1.75rem;
+  border: 1px solid var(--cm-border);
+  border-radius: 10px;
+  background: rgb(10 12 15 / 0.92);
+  color: var(--cm-text);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* The strip above the classic map: radius, refresh, when it was updated, and the counts. */
+.classic-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--cm-border);
+  background: var(--cm-surface);
+  color: var(--cm-text-2);
+  font-family: var(--cm-mono);
+}
+
+.classic-bar__label {
+  color: var(--cm-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.classic-bar__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.classic-pill {
+  min-height: 2.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.875rem;
+  border: 1px solid var(--cm-border);
+  border-radius: 9999px;
+  background: var(--cm-surface-2);
+  color: var(--cm-text-2);
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.classic-pill:hover:not(:disabled, [aria-pressed="true"]) {
+  border-color: var(--cm-muted);
+  color: var(--cm-text);
+}
+
+.classic-pill[aria-pressed="true"] {
+  border-color: var(--cm-blue);
+  background: rgb(52 152 219 / 0.15);
+  color: var(--cm-blue);
+}
+
+.classic-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.classic-pill:focus-visible {
+  outline: 2px solid var(--cm-blue);
+  outline-offset: 2px;
+}
+
+.classic-bar__note {
+  font-size: 0.7rem;
+}
+
+.classic-bar__error {
+  color: #ff8b96;
+  font-size: 0.72rem;
+}
+
+.classic-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.classic-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--chip) 40%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--chip) 12%, transparent);
+  color: var(--chip);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.classic-chip::before {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 9999px;
+  background: var(--chip);
+  content: "";
+}
+
+.classic-chip-blue {
+  --chip: var(--cm-blue);
+}
+
+.classic-chip-amber {
+  --chip: var(--cm-amber);
+}
+
+.classic-chip-green {
+  --chip: var(--cm-green);
+}
+
+.classic-chip-red {
+  --chip: var(--cm-red);
 }

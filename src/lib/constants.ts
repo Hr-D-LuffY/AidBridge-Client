@@ -49,6 +49,15 @@ export const POLL_INTERVAL_MS = {
   notifications: 30_000,
 } as const
 
+// Chat: the backend caps a message at 500 characters and a page at 100 (newest first).
+export const CHAT_MESSAGE_MAX_LENGTH = 500
+export const CHAT_PAGE_SIZE = 100
+
+// Rating a volunteer: whole stars from 1 to this.
+export const RATING_MAX = 5
+
+export const NOTIFICATION_PAGE_SIZE = 10
+
 // SOS field rules and limits (backend: constants/sos.ts, volunteer-request.interface.ts).
 export const SOS_DESCRIPTION_MAX_LENGTH = 1000
 export const SOS_ADDRESS_MAX_LENGTH = 300

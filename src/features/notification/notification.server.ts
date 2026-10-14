@@ -1,13 +1,8 @@
 import 'server-only'
 import { serverApi } from '@/lib/api/server'
-import type { AppNotification } from '@/types'
 
-// There is no unread-count endpoint, so ask for one unread item and read the total from `meta`
-// (see AGENTS.md, notifications).
+// How many notifications the caller has not opened (GET /notifications/unread-count, X5).
 export async function getUnreadNotificationCount(): Promise<number> {
-  const { meta } = await serverApi.getList<AppNotification>('/notifications', {
-    unread: true,
-    limit: 1,
-  })
-  return meta.total
+  const { count } = await serverApi.get<{ count: number }>('/notifications/unread-count')
+  return count
 }

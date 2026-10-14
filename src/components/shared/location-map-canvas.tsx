@@ -23,8 +23,8 @@ const PIN_ICON = L.divIcon({
     <ellipse cx="20" cy="49" rx="5.5" ry="1.8" fill="var(--foreground)" opacity="0.3"/>
     <path d="M14 33 20 46.5 26 33Z" fill="currentColor" stroke="var(--background)" stroke-width="2.5" stroke-linejoin="round"/>
     <circle cx="20" cy="19" r="17" fill="currentColor" stroke="var(--background)" stroke-width="3"/>
-    <circle cx="20" cy="13.5" r="5" fill="var(--primary-foreground)"/>
-    <path d="M10.8 30c0-6.2 4-9.6 9.2-9.6s9.2 3.4 9.2 9.6z" fill="var(--primary-foreground)"/>
+    <circle cx="20" cy="13.5" r="5" fill="var(--background)"/>
+    <path d="M10.8 30c0-6.2 4-9.6 9.2-9.6s9.2 3.4 9.2 9.6z" fill="var(--background)"/>
   </svg>`,
   iconSize: [38, 50],
   iconAnchor: [19, 47],

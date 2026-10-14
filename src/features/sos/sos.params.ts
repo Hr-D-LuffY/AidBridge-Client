@@ -9,10 +9,6 @@ export const SOS_PAGE_SIZE = 6
 // sorts newest first and only filters by status and priority, so search, needs and sort order live here.
 export const SOS_FETCH_PARAMS: SosListParams = { limit: 100 }
 
-// 'open' is not a status: it stands for every request still being worked on.
-export const OPEN_FILTER = 'open'
-export type SosStatusFilter = SosStatus | typeof OPEN_FILTER
-
 export const SosSort = {
   NEWEST: 'newest',
   OLDEST: 'oldest',
@@ -30,7 +26,7 @@ export const SOS_SORT_LABEL: Record<SosSort, string> = {
 
 export type SosViewParams = {
   page: number
-  status?: SosStatusFilter
+  status?: SosStatus
   priority?: Priority
   need?: ReliefCategory
   q: string
@@ -53,7 +49,7 @@ export function parseSosViewParams(raw: {
   const page = Number(raw.page)
   return {
     page: Number.isInteger(page) && page >= DEFAULT_PAGE ? page : DEFAULT_PAGE,
-    status: oneOf([...Object.values(SosStatus), OPEN_FILTER], raw.status),
+    status: oneOf(Object.values(SosStatus), raw.status),
     priority: oneOf(Object.values(Priority), raw.priority),
     need: oneOf(Object.values(ReliefCategory), raw.need),
     q: (raw.q ?? '').trim().slice(0, 100),

@@ -27,7 +27,7 @@ export function SosLocationPanel({ sos }: { sos: SosRequest }) {
         type="button"
         data-pulse={!open}
         onClick={() => setOpen(true)}
-        className="map-button flex min-h-11 w-fit cursor-pointer items-center gap-2 rounded-xl border border-primary/40 bg-sidebar-accent px-4 py-2 text-sm font-medium text-sidebar-accent-foreground outline-none transition-colors hover:bg-sidebar-accent/70 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="map-button flex min-h-11 w-fit cursor-pointer items-center gap-2 rounded-xl border border-info/40 bg-info-soft px-4 py-2 text-sm font-medium text-info outline-none transition-colors hover:bg-info-soft/70 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <MapsLocation02Icon size={22} />
         View on map

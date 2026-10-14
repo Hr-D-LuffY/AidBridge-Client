@@ -1,13 +1,5 @@
 import { Priority, type SosRequest, SosStatus } from '@/types'
-import { OPEN_FILTER, SOS_PAGE_SIZE, SosSort, type SosViewParams } from './sos.params'
-
-const OPEN_STATUSES: readonly SosStatus[] = [
-  SosStatus.PENDING,
-  SosStatus.ASSIGNED,
-  SosStatus.ON_THE_WAY,
-]
-
-export const isOpenStatus = (status: SosStatus) => OPEN_STATUSES.includes(status)
+import { SOS_PAGE_SIZE, SosSort, type SosViewParams } from './sos.params'
 
 const PRIORITY_RANK: Record<Priority, number> = {
   [Priority.CRITICAL]: 0,
@@ -36,13 +28,7 @@ const COMPARE: Record<SosSort, (a: SosRequest, b: SosRequest) => number> = {
 }
 
 function matches(sos: SosRequest, view: SosViewParams) {
-  if (
-    view.status === OPEN_FILTER
-      ? !isOpenStatus(sos.status)
-      : view.status && sos.status !== view.status
-  ) {
-    return false
-  }
+  if (view.status && sos.status !== view.status) return false
   if (view.priority && sos.priority !== view.priority) return false
   if (view.need && !sos.needs.includes(view.need)) return false
   if (view.q) {

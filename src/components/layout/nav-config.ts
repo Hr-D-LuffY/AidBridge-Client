@@ -99,6 +99,11 @@ export function getProfilePath(role: Role) {
   return `${ROLE_HOME_PATH[role]}/profile`
 }
 
+// ...and the same notifications page (the bell in the top bar links to it).
+export function getNotificationsPath(role: Role) {
+  return `${ROLE_HOME_PATH[role]}/notifications`
+}
+
 // The item that marks the current page: the longest href that the path equals or sits under, so on
 // /dashboard/sos/new only "Raise SOS" is current, not "My requests" as well. The overview matches
 // only its own URL, because every other page of the area is under it.

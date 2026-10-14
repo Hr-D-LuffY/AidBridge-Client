@@ -20,6 +20,11 @@ export function formatRelativeTime(value: string | Date): string {
   return formatDistanceToNow(new Date(value), { addSuffix: true })
 }
 
+// "14 Oct 2026"
+export function formatDate(value: string | Date): string {
+  return format(new Date(value), 'd MMM yyyy')
+}
+
 // "14 Oct 2026, 3:05 PM"
 export function formatDateTime(value: string | Date): string {
   return format(new Date(value), 'd MMM yyyy, h:mm a')

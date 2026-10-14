@@ -4,7 +4,8 @@ import { cn } from '@/lib/utils'
 
 type FilterChipsProps<T extends string> = {
   label: string
-  options: readonly { value: T; label: string }[]
+  // `swatch`: classes for a small round colour sample before the label, for options whose colour means something elsewhere on the page.
+  options: readonly { value: T; label: string; swatch?: string }[]
   // undefined means "All".
   value: T | undefined
   onChange: (value: T | undefined) => void
@@ -23,7 +24,7 @@ export function FilterChips<T extends string>({
   allLabel = 'All',
   hideAll = false,
 }: FilterChipsProps<T>) {
-  const all: { value: T | undefined; label: string }[] = hideAll
+  const all: { value: T | undefined; label: string; swatch?: string }[] = hideAll
     ? [...options]
     : [{ value: undefined, label: allLabel }, ...options]
 
@@ -48,6 +49,15 @@ export function FilterChips<T extends string>({
                 : 'border-input bg-card hover:bg-muted',
             )}
           >
+            {option.swatch && (
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'mr-2 inline-block size-4 rounded-full border align-text-bottom',
+                  option.swatch,
+                )}
+              />
+            )}
             {option.label}
           </button>
         )

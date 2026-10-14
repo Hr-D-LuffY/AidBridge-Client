@@ -42,3 +42,12 @@ export type SessionUser = {
   name: string
   role: Role
 }
+
+// PUT /auth/me takes any of these (at least one). Email and role cannot be changed.
+export type UpdateProfilePayload = {
+  name?: string
+  phone?: string
+  // [lng, lat]
+  location?: [number, number]
+  isAvailable?: boolean
+}

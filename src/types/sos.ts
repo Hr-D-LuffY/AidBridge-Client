@@ -1,5 +1,12 @@
 import type { PaginationParams } from './api'
-import type { MediaResourceType, Priority, ReliefCategory, ResolvedBy, SosStatus } from './enums'
+import type {
+  MediaResourceType,
+  Priority,
+  ReliefCategory,
+  ResolvedBy,
+  SosStatus,
+  TaskStatus,
+} from './enums'
 import type { GeoPoint } from './user'
 
 export type MediaItem = {
@@ -12,6 +19,15 @@ export type SosPerson = {
   id: string
   name: string
   phone: string
+}
+
+// The volunteer's task on a request, as its victim sees it (only on GET /sos/:id for the victim). `null`
+// while nobody has taken the request. `canRate` is true once the task is completed and not yet rated.
+export type SosTaskSummary = {
+  id: string
+  status: TaskStatus
+  isRated: boolean
+  canRate: boolean
 }
 
 // The full view: what the victim, the assigned volunteer, admins and NGOs get. Volunteers who have not
@@ -30,6 +46,8 @@ export type SosRequest = {
   resolvedAt: string | null
   resolvedBy: ResolvedBy | null
   resolveReason: string | null
+  // Present on the single-request read for the victim; the list does not carry it.
+  task?: SosTaskSummary | null
   createdAt: string
   updatedAt: string
 }
