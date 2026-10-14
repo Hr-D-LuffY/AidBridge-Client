@@ -1,5 +1,6 @@
 export * from './api'
 export * from './camp'
+export * from './distribution'
 export * from './enums'
 export * from './message'
 export * from './notification'

@@ -2,7 +2,11 @@ import { cn } from '@/lib/utils'
 
 export type PlaceRow = { label: string; value: string }
 
-export type PlaceStatus = { label: string; tone: 'open' | 'full' }
+// 'open' is green and 'full' amber (camps). The four priorities colour a request: critical red, high
+// orange, medium amber, low blue. 'task' (violet) is a request the volunteer has taken.
+export type PlaceTone = 'open' | 'full' | 'critical' | 'high' | 'medium' | 'low' | 'task'
+
+export type PlaceStatus = { label: string; tone: PlaceTone }
 
 // The dark card that opens when a place on a map is hovered or tapped: small uppercase labels with
 // their values, and an optional last row with a coloured dot. Both camp maps use it, so the hover looks

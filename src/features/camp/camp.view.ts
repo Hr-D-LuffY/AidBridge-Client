@@ -1,15 +1,14 @@
 import type { PlaceRow, PlaceStatus } from '@/components/shared/place-card'
 import type { MapLegendItem, MapPlace } from '@/components/shared/places-map-canvas'
-import { fromGeoPoint } from '@/lib/geo'
+import { fromGeoPoint, getDirectionsUrl } from '@/lib/geo'
 import type { CampSummary } from '@/types'
 
 // How a camp is shown on a map and in its hover card. Shared by the camps page and a camp's own page.
 
-export const isCampFull = (camp: CampSummary) => camp.availableSpots <= 0
+export const isCampFull = (camp: Pick<CampSummary, 'availableSpots'>) => camp.availableSpots <= 0
 
-export function campDirectionsUrl({ location }: CampSummary) {
-  const [lng, lat] = location.coordinates
-  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+export function campDirectionsUrl({ location }: Pick<CampSummary, 'location'>) {
+  return getDirectionsUrl(location)
 }
 
 export function formatCampGps({ location }: CampSummary) {

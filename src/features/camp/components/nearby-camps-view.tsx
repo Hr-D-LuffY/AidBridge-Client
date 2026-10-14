@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils'
 import type { NearbyCamp } from '@/types'
 import { useNearbyCampsQuery } from '../camp.queries'
 import { CAMP_MAP_LEGEND, campDirectionsUrl, isCampFull, toMapPlace } from '../camp.view'
+import { OccupancyBar } from './occupancy-bar'
 
 const MAP_ID = 'camps-map'
 
@@ -41,7 +42,6 @@ function CampCard({
   onShowOnMap: () => void
 }) {
   const full = isCampFull(camp)
-  const filled = Math.min(100, Math.round((camp.currentOccupancy / camp.capacity) * 100))
 
   return (
     <li
@@ -62,19 +62,7 @@ function CampCard({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <div
-          role="progressbar"
-          aria-label={`${camp.name} is ${filled}% full`}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={filled}
-          className="h-2 overflow-hidden rounded-full bg-muted"
-        >
-          <div
-            className={cn('h-full rounded-full', full ? 'bg-warning' : 'bg-success')}
-            style={{ width: `${filled}%` }}
-          />
-        </div>
+        <OccupancyBar camp={camp} />
         <p className="text-sm">
           {full ? (
             <span className="font-semibold text-warning">Full right now</span>

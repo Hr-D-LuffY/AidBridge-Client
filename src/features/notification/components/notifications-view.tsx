@@ -1,20 +1,23 @@
 'use client'
 
-import { Bell, BellOff, CheckCheck, Megaphone } from 'lucide-react'
+import { ArrowRight, Bell, BellOff, CheckCheck, Megaphone } from 'lucide-react'
+import Link from 'next/link'
 import { EmptyState } from '@/components/shared/empty-state'
 import { FilterChips } from '@/components/shared/filter-chips'
 import { ListErrorState } from '@/components/shared/list-error-state'
 import { PageHeader } from '@/components/shared/page-header'
 import { PaginationBar } from '@/components/shared/pagination-bar'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { usePolling } from '@/hooks/use-polling'
 import { useQueryParams } from '@/hooks/use-query-params'
+import { useSession } from '@/hooks/use-session'
 import { NOTIFICATION_PAGE_SIZE, POLL_INTERVAL_MS } from '@/lib/constants'
 import { formatDateTime, formatRelativeTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { AppNotification } from '@/types'
 import { useMarkNotificationRead, useNotificationsQuery } from '../notification.queries'
+import { getNotificationHref } from '../notification.view'
 
 const FILTER_OPTIONS = [{ value: 'unread', label: 'Unread' }] as const
 type Filter = (typeof FILTER_OPTIONS)[number]['value']
@@ -28,7 +31,9 @@ function NotificationItem({
   onRead: (notification: AppNotification) => void
   disabled: boolean
 }) {
+  const { role } = useSession()
   const { title, message, isRead, isEmergencyBroadcast, createdAt } = notification
+  const href = getNotificationHref(role, notification.sosRequestId)
   return (
     <li
       className={cn(
@@ -60,17 +65,32 @@ function NotificationItem({
       </div>
       <h2 className="text-base font-semibold text-balance">{title}</h2>
       <p className="text-sm text-pretty whitespace-pre-line">{message}</p>
-      {!isRead && (
-        <Button
-          type="button"
-          variant="outline"
-          className="mt-1 h-10 w-fit gap-2 px-4"
-          disabled={disabled}
-          onClick={() => onRead(notification)}
-        >
-          <CheckCheck aria-hidden="true" />
-          Mark as read
-        </Button>
+      {(href || !isRead) && (
+        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {href && (
+            <Link
+              href={href}
+              // Opening the conversation is reading it.
+              onClick={() => !isRead && onRead(notification)}
+              className={cn(buttonVariants(), 'h-10 gap-2 px-4')}
+            >
+              Open the conversation
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          )}
+          {!isRead && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 gap-2 px-4"
+              disabled={disabled}
+              onClick={() => onRead(notification)}
+            >
+              <CheckCheck aria-hidden="true" />
+              Mark as read
+            </Button>
+          )}
+        </div>
       )}
     </li>
   )

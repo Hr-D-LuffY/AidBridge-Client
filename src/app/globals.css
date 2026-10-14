@@ -348,8 +348,25 @@
   transform: scale(1.14);
 }
 
-.place-pin-full {
+.place-pin-full,
+.place-pin-medium {
   color: var(--cm-amber);
+}
+
+.place-pin-critical {
+  color: var(--cm-red);
+}
+
+.place-pin-high {
+  color: var(--cm-orange);
+}
+
+.place-pin-low {
+  color: var(--cm-blue);
+}
+
+.place-pin-task {
+  color: var(--cm-violet);
 }
 
 /* The search radius drawn around "you". */
@@ -372,6 +389,8 @@
   --cm-blue: #3498db;
   --cm-green: #2ecc71;
   --cm-amber: #f39c12;
+  --cm-orange: #ff8a3d;
+  --cm-violet: #b48cff;
   --cm-red: #ff6b75;
   --cm-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
@@ -391,6 +410,13 @@
   fill-opacity: 0.92;
   stroke: #fff;
   stroke-width: 2.5;
+}
+
+/* The dashed line from "you" to a task. */
+.classic-route {
+  stroke: var(--cm-violet);
+  fill: none;
+  stroke-linecap: round;
 }
 
 .classic-radius {
@@ -474,8 +500,25 @@
   background: var(--cm-green);
 }
 
-.classic-card__dot-full {
+.classic-card__dot-full,
+.classic-card__dot-medium {
   background: var(--cm-amber);
+}
+
+.classic-card__dot-critical {
+  background: var(--cm-red);
+}
+
+.classic-card__dot-high {
+  background: var(--cm-orange);
+}
+
+.classic-card__dot-low {
+  background: var(--cm-blue);
+}
+
+.classic-card__dot-task {
+  background: var(--cm-violet);
 }
 
 /* "YOU ARE HERE" */
@@ -497,7 +540,7 @@
 
 .classic-legend {
   position: absolute;
-  bottom: 4rem; /* above the credit (i) button of MapControls */
+  top: 0.75rem; /* top left, clear of the credit (i) button and its text at the bottom left */
   left: 0.75rem;
   z-index: 1000;
   display: flex;
@@ -542,25 +585,53 @@
   background: var(--cm-green);
 }
 
-.classic-legend__dot-full {
+.classic-legend__dot-full,
+.classic-legend__dot-medium {
   background: var(--cm-amber);
 }
 
+.classic-legend__dot-critical {
+  background: var(--cm-red);
+}
+
+.classic-legend__dot-high {
+  background: var(--cm-orange);
+}
+
+.classic-legend__dot-low {
+  background: var(--cm-blue);
+}
+
+.classic-legend__dot-task {
+  background: var(--cm-violet);
+}
+
+/* "Nothing found" note: a small pill along the bottom of the map, between the credit button and the map
+   buttons, so it never covers the pins, the legend or the area the user is looking at. */
 .classic-empty {
   position: absolute;
-  top: 50%;
+  bottom: 1rem;
   left: 50%;
   z-index: 1000;
-  max-width: 18rem;
-  padding: 1.25rem 1.75rem;
+  max-width: calc(100% - 8rem);
+  padding: 0.5rem 1rem;
   border: 1px solid var(--cm-border);
-  border-radius: 10px;
+  border-radius: 9999px;
   background: rgb(10 12 15 / 0.92);
   color: var(--cm-text);
+  font-size: 0.8125rem;
   text-align: center;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   backdrop-filter: blur(8px);
   pointer-events: none;
+}
+
+.classic-empty p {
+  display: inline;
+}
+
+.classic-empty p + p::before {
+  content: " ";
 }
 
 /* The strip above the classic map: radius, refresh, when it was updated, and the counts. */

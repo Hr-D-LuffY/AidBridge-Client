@@ -2,9 +2,11 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { taskKeys } from '@/features/task/task.keys'
 import { getErrorMessage, isApiError } from '@/lib/api/errors'
 import {
   type CreateSosPayload,
+  type NearbySosParams,
   type SosListParams,
   type SosRequest,
   SosStatus,
@@ -123,6 +125,65 @@ export function useRemoveSosMedia(id: string) {
     onSuccess: (sos) => {
       syncSos(sos)
       toast.success('Removed.')
+    },
+  })
+}
+
+// Pending requests around a point, for a volunteer. `params` is null until the position is known, and
+// the query waits for it. `pollMs` comes from usePolling(), so a hidden tab sends nothing.
+export function useNearbySosQuery(params: NearbySosParams | null, pollMs: number | false) {
+  return useQuery({
+    queryKey: sosKeys.nearby(params ?? { lng: 0, lat: 0 }),
+    queryFn: ({ signal }) => sosApi.nearby(params as NearbySosParams, signal),
+    enabled: params !== null,
+    refetchInterval: pollMs,
+    // Keep the old requests on screen while a wider radius loads.
+    placeholderData: keepPreviousData,
+  })
+}
+
+// Takes a request. It is one atomic claim on the server, so when two volunteers press at once one of
+// them gets a 409: the list is read again (the card is gone) and the message says why. The caller moves
+// on to the new task when it succeeds.
+export function useAcceptSos() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => sosApi.accept(id),
+    meta: { skipGlobalError: true },
+    onSuccess: () => {
+      toast.success('Request accepted. Their phone number and exact location are now yours.')
+    },
+    onError: (error) => {
+      if (isApiError(error) && error.isConflict) {
+        toast.error('This request could not be accepted', { description: error.message })
+        return
+      }
+      toast.error(getErrorMessage(error))
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: sosKeys.nearbyLists() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+    },
+  })
+}
+
+// "No thanks" on a request, or backing out of one the volunteer accepted. The server tells which one
+// it was, and the message says so: a declined request is hidden for good, a withdrawn one goes back to
+// the other volunteers.
+export function useRejectSos() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => sosApi.reject(id),
+    onSuccess: ({ outcome }) => {
+      toast.success(
+        outcome === 'withdrawn'
+          ? 'You backed out. The request is open to other volunteers again.'
+          : 'Request hidden. You will not see it again.',
+      )
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: sosKeys.nearbyLists() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
     },
   })
 }

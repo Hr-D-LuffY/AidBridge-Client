@@ -46,6 +46,8 @@ export const SEARCH_DEBOUNCE_MS = 400
 export const POLL_INTERVAL_MS = {
   chat: 5_000,
   sosStatus: 15_000,
+  // A volunteer waiting for work: new requests appear without a reload.
+  nearby: 30_000,
   notifications: 30_000,
 } as const
 
@@ -69,6 +71,16 @@ export const VOLUNTEER_REQUEST_MAX_LENGTH = 500
 // Nearby camps: the backend caps the radius at 50 km.
 export const CAMP_RADIUS_OPTIONS_KM = [5, 10, 25, 50] as const
 export const DEFAULT_CAMP_RADIUS_KM = 10
+
+// Volunteers (backend: constants/task.ts, constants/distribution.ts, constants/inventory.ts).
+export const MAX_ACTIVE_TASKS = 3
+export const SOS_RADIUS_OPTIONS_KM = [5, 10, 25, 50] as const
+export const DEFAULT_SOS_RADIUS_KM = 10
+// The nearest requests asked for at once (the backend allows up to 100 a page).
+export const NEARBY_PAGE_SIZE = 50
+export const TASK_HISTORY_PAGE_SIZE = 10
+export const DISTRIBUTION_NOTES_MAX_LENGTH = 500
+export const MAX_STOCK_QUANTITY = 1_000_000_000
 
 // SOS media rules (backend: constants/sos.ts). Checked in the browser first so a bad file is
 // refused before the upload starts.

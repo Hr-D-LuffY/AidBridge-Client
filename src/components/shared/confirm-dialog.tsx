@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, TriangleAlert } from 'lucide-react'
+import { CircleCheck, Loader2, TriangleAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import {
   AlertDialog,
@@ -29,6 +29,10 @@ type ConfirmDialogProps = {
   children?: ReactNode
   // Keeps "Confirm" off until the input in `children` is valid.
   confirmDisabled?: boolean
+  // 'danger' (red, a warning sign) for something that cannot be undone or takes something away.
+  // 'neutral' (blue, a tick) for a step the user wants but should not hit by accident, like "I have
+  // arrived".
+  tone?: 'danger' | 'neutral'
 }
 
 // Every destructive or irreversible action (resolve or close an SOS, delete a camp, incident, stock
@@ -45,13 +49,18 @@ export function ConfirmDialog({
   pending = false,
   children,
   confirmDisabled = false,
+  tone = 'danger',
 }: ConfirmDialogProps) {
+  const danger = tone === 'danger'
+  const Icon = danger ? TriangleAlert : CircleCheck
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-destructive-soft text-destructive">
-            <TriangleAlert aria-hidden="true" />
+          <AlertDialogMedia
+            className={danger ? 'bg-destructive-soft text-destructive' : 'bg-info-soft text-info'}
+          >
+            <Icon aria-hidden="true" />
           </AlertDialogMedia>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -62,7 +71,7 @@ export function ConfirmDialog({
             {cancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
-            variant="destructive"
+            variant={danger ? 'destructive' : 'default'}
             className="h-10 px-4"
             disabled={pending || confirmDisabled}
             onClick={onConfirm}

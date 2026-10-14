@@ -69,3 +69,42 @@ export type CreateSosPayload = {
 export type UpdateSosPayload = Partial<CreateSosPayload> & {
   removeMediaIds?: string[]
 }
+
+// What a volunteer sees of a request they have not taken (GET /sos/nearby, and GET /sos/:id while it is
+// pending): the first name, a position rounded to about 1 km, no phone, no street address, no photos.
+export type LimitedSos = {
+  id: string
+  victim: { name: string }
+  needs: ReliefCategory[]
+  description: string | null
+  approximateLocation: GeoPoint
+  priority: Priority
+  status: SosStatus
+  createdAt: string
+  // Metres from the point asked about. Only on GET /sos/nearby.
+  distanceMeters?: number
+}
+
+export type NearbySos = LimitedSos & { distanceMeters: number }
+
+export type NearbySosParams = PaginationParams & {
+  lng: number
+  lat: number
+  // metres, 50 000 at most
+  radius?: number
+}
+
+// GET /sos/:id answers a volunteer with the full request once it is theirs and the limited one while it
+// is pending. They are told apart by what they carry, so a missing field is never assumed.
+export type SosView = SosRequest | LimitedSos
+
+export function isFullSos(sos: SosView): sos is SosRequest {
+  return 'location' in sos
+}
+
+// PUT /sos/:id/reject. `declined`: the request is hidden from this volunteer's list for good.
+// `withdrawn`: the volunteer backed out of a request they had accepted, and it is open to others again.
+export type RejectSosResult = {
+  sosRequestId: string
+  outcome: 'declined' | 'withdrawn'
+}
