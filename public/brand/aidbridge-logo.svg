@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 280" width="1000" height="280">
+  <defs>
+    <linearGradient id="v4_bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1118"/>
+      <stop offset="50%" stop-color="#131b25"/>
+      <stop offset="100%" stop-color="#0b1118"/>
+    </linearGradient>
+
+    <linearGradient id="v4_redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5c61"/>
+      <stop offset="100%" stop-color="#e51f26"/>
+    </linearGradient>
+
+    <linearGradient id="v4_bridgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff5c61"/>
+      <stop offset="50%" stop-color="#edf2f8"/>
+      <stop offset="100%" stop-color="#5083f1"/>
+    </linearGradient>
+
+    <filter id="v4_glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background container with generous width to prevent clipping -->
+  <rect width="1000" height="280" rx="18" fill="url(#v4_bgGrad)"/>
+  <rect width="998" height="278" x="1" y="1" rx="17" fill="none" stroke="#263240" stroke-width="1.5"/>
+
+  <!-- Brand Mark from the 1st emblem (Shield + Bridge Arches + Relief Cross + Radar) -->
+  <g transform="translate(60, 45)">
+    <!-- Protective Shield Outer Container -->
+    <path d="M 95 10 L 165 40 L 165 118 C 165 156 95 186 95 186 C 95 186 25 156 25 118 L 25 40 Z"
+          fill="#131b25" stroke="#263240" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- Subtle red shield inner accent line -->
+    <path d="M 95 20 L 155 46 L 155 114 C 155 146 95 172 95 172 C 95 172 35 146 35 114 L 35 46 Z"
+          fill="none" stroke="#ff5c61" stroke-width="1.2" opacity="0.35"/>
+
+    <!-- Radar Pulse Waves (Distress broadcast) -->
+    <path d="M 55 60 A 52 52 0 0 1 135 60" fill="none" stroke="#ff5c61" stroke-width="2" stroke-linecap="round" opacity="0.45" stroke-dasharray="3 5"/>
+    <path d="M 68 72 A 34 34 0 0 1 122 72" fill="none" stroke="#ff5c61" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Bridge Arch Span (Connecting Victims & Volunteers) -->
+    <path d="M 42 145 C 60 100, 130 100, 148 145" fill="none" stroke="url(#v4_bridgeGrad)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 54 153 C 70 120, 120 120, 136 153" fill="none" stroke="#22303f" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Vertical Suspension Bridge Cables -->
+    <line x1="76" y1="116" x2="76" y2="142" stroke="#abb6c4" stroke-width="1.5" opacity="0.55"/>
+    <line x1="95" y1="107" x2="95" y2="138" stroke="#abb6c4" stroke-width="1.5" opacity="0.65"/>
+    <line x1="114" y1="116" x2="114" y2="142" stroke="#abb6c4" stroke-width="1.5" opacity="0.55"/>
+
+    <!-- Central Relief & Emergency Medical Cross -->
+    <g transform="translate(95, 90)" filter="url(#v4_glow)">
+      <rect x="-8" y="-23" width="16" height="46" rx="4" fill="url(#v4_redGrad)"/>
+      <rect x="-23" y="-8" width="46" height="16" rx="4" fill="url(#v4_redGrad)"/>
+      <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+    </g>
+
+    <!-- Beacon Pulse Star at apex -->
+    <circle cx="95" cy="22" r="3.5" fill="#ff5c61"/>
+  </g>
+
+  <!-- Typography & Information Section (Properly spaced so nothing is truncated) -->
+  <g transform="translate(285, 82)">
+    <!-- Wordmark -->
+    <text x="0" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="58" letter-spacing="-0.03em">
+      <tspan fill="#edf2f8">Aid</tspan><tspan fill="url(#v4_redGrad)">Bridge</tspan>
+    </text>
+
+    <!-- Disaster OS Status Pill -->
+    <g transform="translate(315, 20)">
+      <rect width="132" height="28" rx="14" fill="#1a2532" stroke="#ff5c61" stroke-width="1" stroke-opacity="0.5"/>
+      <circle cx="16" cy="14" r="4.5" fill="#e51f26"/>
+      <text x="28" y="18" font-family="'Inter', -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#ff5c61" letter-spacing="0.08em">DISASTER OS</text>
+    </g>
+
+    <!-- Subtitle / Platform Mission Description -->
+    <text x="2" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="400" font-size="16" fill="#abb6c4" letter-spacing="0.01em">
+      Rapid SOS Dispatch <tspan fill="#263240">•</tspan> Volunteer Coordination <tspan fill="#263240">•</tspan> NGO Logistics
+    </text>
+
+    <!-- System Status & Coordinates Telemetry Line -->
+    <g transform="translate(2, 126)">
+      <circle cx="5" cy="5" r="4" fill="#36d399"/>
+      <text x="18" y="9" font-family="Consolas, 'SF Mono', monospace" font-size="12" fill="#36d399" font-weight="600" letter-spacing="0.06em">NETWORK ACTIVE</text>
+      <text x="160" y="9" font-family="Consolas, 'SF Mono', monospace" font-size="12" fill="#abb6c4" opacity="0.6">SYS.READY // 24/7 LIVE RESPONSE</text>
+    </g>
+  </g>
+</svg>

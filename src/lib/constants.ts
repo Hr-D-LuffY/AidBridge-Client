@@ -29,9 +29,15 @@ export const DEFAULT_PAGE = 1
 export const DEFAULT_PAGE_SIZE = 10
 export const MAX_PAGE_SIZE = 100
 
-// Password rules (backend: auth.interface.ts).
+// Account field rules (backend: user.interface.ts).
+export const NAME_MIN_LENGTH = 2
+export const NAME_MAX_LENGTH = 100
 export const PASSWORD_MIN_LENGTH = 8
 export const PASSWORD_MAX_LENGTH = 72
+export const PHONE_PATTERN = /^\+?[0-9]{7,15}$/
+
+// A password-reset link carries a 64-character hex token (backend: auth.interface.ts).
+export const RESET_TOKEN_PATTERN = /^[0-9a-f]{64}$/
 
 // Search inputs wait this long after the last keystroke before updating the URL.
 export const SEARCH_DEBOUNCE_MS = 400

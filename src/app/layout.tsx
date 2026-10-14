@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Atkinson_Hyperlegible } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import type { ReactNode } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { publicEnv } from '@/lib/public-env'
@@ -7,11 +7,10 @@ import { QueryProvider } from '@/providers/query-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
 import './globals.css'
 
-// Designed for legibility: distinct letter shapes help in a hurry, on a small or dim screen.
-const atkinson = Atkinson_Hyperlegible({
+// The theme's font. A variable font, so every weight comes from one file, served from this site.
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-atkinson',
+  variable: '--font-inter',
   display: 'swap',
 })
 
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={atkinson.variable} suppressHydrationWarning>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body>
         <ThemeProvider>
           <QueryProvider>

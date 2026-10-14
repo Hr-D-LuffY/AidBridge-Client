@@ -5,14 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * AidBridge design tokens. Calm blue for trust, green for the main call to action, red kept for danger
- * and critical requests only. Every text/background pair is chosen for WCAG AA (4.5:1 text, 3:1 controls).
- * design-system/aidbridge/MASTER.md explains the choices. Components use these tokens (bg-primary,
- * text-muted-foreground, ...). Never hard-code colours.
+ * AidBridge design tokens. Red primary on a navy / cool-grey base, from the supplied theme: the light
+ * theme is :root and the dark theme is .dark (the supplied file had the two blocks the other way round).
+ * Where a supplied value fails WCAG AA it is adjusted and marked "AA" below. Components use these tokens
+ * (bg-primary, text-muted-foreground, ...). Never hard-code colours.
  */
 @theme inline {
-  --font-sans: var(--font-atkinson);
-  --font-heading: var(--font-atkinson);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-inter);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -29,6 +29,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-soft: var(--destructive-soft);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -36,6 +37,7 @@
 
   --color-cta: var(--cta);
   --color-cta-foreground: var(--cta-foreground);
+  --color-link: var(--link);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
@@ -73,33 +75,39 @@
   --shadow-float: var(--shadow-lg);
 }
 
+/* Light theme. */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 
-  --background: #f0f9ff;
-  --foreground: #0c4a6e;
+  --background: #f6f7f9;
+  --foreground: #1f252e;
   --card: #ffffff;
-  --card-foreground: #0c4a6e;
+  --card-foreground: #1f252e;
   --popover: #ffffff;
-  --popover-foreground: #0c4a6e;
-  --primary: #0369a1;
+  --popover-foreground: #1f252e;
+  --primary: #e51f26;
   --primary-foreground: #ffffff;
-  --secondary: #e0f2fe;
-  --secondary-foreground: #0c4a6e;
-  --muted: #e7eff5;
-  --muted-foreground: #475569;
-  --accent: #dbeafe;
-  --accent-foreground: #0c4a6e;
+  --secondary: #f0f2f5;
+  --secondary-foreground: #1f252e;
+  --muted: #f0f2f5;
+  /* AA: the supplied #6e7681 is 4.3:1 on the page colour. */
+  --muted-foreground: #5f6873;
+  --accent: #fdeded;
+  --accent-foreground: #b8141a;
+  /* AA: the supplied hsl(0 84% 60%) is 3.6:1 as small error text on the light page. */
   --destructive: #b91c1c;
+  --destructive-foreground: #f8fafc;
   --destructive-soft: oklch(0.95 0.03 17);
-  --border: #cfe0ec;
-  /* Form controls need 3:1 against the page (WCAG 1.4.11), so the input border is darker than --border. */
-  --input: #7d95a8;
-  --ring: #0369a1;
+  --border: #e4e8ec;
+  /* Form controls need 3:1 against the page (WCAG 1.4.11); the supplied #e4e8ec is 1.2:1. */
+  --input: #8794a3;
+  --ring: #e51f26;
 
-  /* Main call to action (raise an SOS, accept a request). White text on this green is 5:1. */
-  --cta: #15803d;
+  /* Main call to action (ask for help, accept a request): the brand red. */
+  --cta: #e51f26;
   --cta-foreground: #ffffff;
+  /* Small text links. The brand red is 4.4:1 as text on the page, this darker red is 6.8:1. */
+  --link: #b8141a;
 
   /* Status colours: one set, used by StatusBadge and PriorityBadge for every enum. */
   --success: oklch(0.45 0.13 151);
@@ -109,52 +117,63 @@
   /* "high" priority sits between warning (amber) and destructive (red). */
   --high: oklch(0.5 0.16 42);
   --high-soft: oklch(0.955 0.04 55);
-  --info: #0369a1;
-  --info-soft: #e0f2fe;
+  /* Information is blue now, because the primary colour is red. */
+  --info: #1d4ed8;
+  --info-soft: #e3ebff;
 
-  --chart-1: #0369a1;
-  --chart-2: #15803d;
-  --chart-3: #b45309;
-  --chart-4: #0f766e;
-  --chart-5: #64748b;
+  --chart-1: #e51f26;
+  --chart-2: #2463eb;
+  --chart-3: #f59f0a;
+  --chart-4: #10b77f;
+  --chart-5: #895af6;
 
   --sidebar: #ffffff;
-  --sidebar-foreground: #0c4a6e;
-  --sidebar-primary: #0369a1;
+  --sidebar-foreground: #1f252e;
+  --sidebar-primary: #e51f26;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e0f2fe;
-  --sidebar-accent-foreground: #0c4a6e;
-  --sidebar-border: #cfe0ec;
-  --sidebar-ring: #0369a1;
+  --sidebar-accent: #fdeded;
+  --sidebar-accent-foreground: #b8141a;
+  --sidebar-border: #e4e8ec;
+  --sidebar-ring: #e51f26;
 
-  --shadow-sm: 0 1px 2px oklch(0.3 0.05 240 / 0.06);
-  --shadow-md: 0 4px 12px oklch(0.3 0.05 240 / 0.09);
-  --shadow-lg: 0 12px 28px oklch(0.3 0.05 240 / 0.14);
+  --shadow-color: #1f252e;
+  --shadow-opacity: 0.08;
+  --shadow-blur: 24px;
+  --shadow-offset-y: 8px;
+  --shadow-sm: 0 1px 2px color-mix(in oklab, var(--shadow-color) 10%, transparent);
+  --shadow-md: 0 4px 12px color-mix(in oklab, var(--shadow-color) 10%, transparent);
+  --shadow-lg: 0 var(--shadow-offset-y) var(--shadow-blur)
+    color-mix(in oklab, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
 }
 
+/* Dark theme. */
 .dark {
-  --background: #0b1220;
-  --foreground: #e6f1fa;
-  --card: #111b2e;
-  --card-foreground: #e6f1fa;
-  --popover: #111b2e;
-  --popover-foreground: #e6f1fa;
-  --primary: #38bdf8;
-  --primary-foreground: #0b1220;
-  --secondary: #16263d;
-  --secondary-foreground: #e6f1fa;
-  --muted: #16223a;
-  --muted-foreground: #9fb3c8;
-  --accent: #1b2d4a;
-  --accent-foreground: #e6f1fa;
-  --destructive: #f87171;
+  --background: #0b1118;
+  --foreground: #edf2f8;
+  --card: #131b25;
+  --card-foreground: #edf2f8;
+  --popover: #131b25;
+  --popover-foreground: #edf2f8;
+  --primary: #e51f26;
+  --primary-foreground: #ffffff;
+  --secondary: #1a2532;
+  --secondary-foreground: #edf2f8;
+  --muted: #1a2532;
+  --muted-foreground: #abb6c4;
+  --accent: #22303f;
+  --accent-foreground: #edf2f8;
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(210 40% 98%);
   --destructive-soft: oklch(0.3 0.07 22);
-  --border: #22344f;
-  --input: #5c7694;
-  --ring: #38bdf8;
+  --border: #263240;
+  /* Form controls need 3:1 against the page (WCAG 1.4.11); the supplied #2d3948 is 1.7:1. */
+  --input: #5b6b7f;
+  --ring: #ff5c61;
 
-  --cta: #4ade80;
-  --cta-foreground: #052e16;
+  --cta: #e51f26;
+  --cta-foreground: #ffffff;
+  /* The brand red is 4.1:1 as small text on the dark page, this lighter red is 6.9:1. */
+  --link: #ff5c61;
 
   --success: oklch(0.8 0.17 152);
   --success-soft: oklch(0.3 0.06 152);
@@ -162,27 +181,32 @@
   --warning-soft: oklch(0.32 0.06 80);
   --high: oklch(0.76 0.15 50);
   --high-soft: oklch(0.32 0.06 50);
-  --info: #7dd3fc;
-  --info-soft: #12304a;
+  --info: #8fb0ff;
+  --info-soft: oklch(0.3 0.06 265);
 
-  --chart-1: #38bdf8;
-  --chart-2: #4ade80;
-  --chart-3: #fbbf24;
-  --chart-4: #2dd4bf;
-  --chart-5: #94a3b8;
+  --chart-1: #ff5c61;
+  --chart-2: #5083f1;
+  --chart-3: #fbbd23;
+  --chart-4: #36d399;
+  --chart-5: #a689fa;
 
-  --sidebar: #0e1729;
-  --sidebar-foreground: #e6f1fa;
-  --sidebar-primary: #38bdf8;
-  --sidebar-primary-foreground: #0b1220;
-  --sidebar-accent: #16263d;
-  --sidebar-accent-foreground: #e6f1fa;
-  --sidebar-border: #22344f;
-  --sidebar-ring: #38bdf8;
+  --sidebar: #0e151d;
+  --sidebar-foreground: #edf2f8;
+  --sidebar-primary: #e51f26;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a2532;
+  --sidebar-accent-foreground: #edf2f8;
+  --sidebar-border: #263240;
+  --sidebar-ring: #ff5c61;
 
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
-  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.35);
-  --shadow-lg: 0 12px 28px oklch(0 0 0 / 0.45);
+  --shadow-color: #000000;
+  --shadow-opacity: 0.34;
+  --shadow-blur: 30px;
+  --shadow-offset-y: 12px;
+  --shadow-sm: 0 1px 2px color-mix(in oklab, var(--shadow-color) 30%, transparent);
+  --shadow-md: 0 4px 12px color-mix(in oklab, var(--shadow-color) 35%, transparent);
+  --shadow-lg: 0 var(--shadow-offset-y) var(--shadow-blur)
+    color-mix(in oklab, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
 }
 
 @layer base {
