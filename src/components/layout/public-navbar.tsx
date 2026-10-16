@@ -21,7 +21,9 @@ import { BrandLogo } from './brand-logo'
 import { type NavEntry, type NavItem, PUBLIC_NAV } from './nav-config'
 
 function isActive(pathname: string, href: string) {
-  const path = href.split('#')[0] || '/'
+  // A link to a section of a page (/#faq) has no "current page" of its own.
+  if (href.includes('#')) return false
+  const path = href || '/'
   return path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(`${path}/`)
 }
 

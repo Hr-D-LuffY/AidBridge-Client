@@ -1,9 +1,16 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { EmergencySection } from '@/components/home/emergency-section'
+import { FeatureBento } from '@/components/home/feature-bento'
+import { GuidesGallery } from '@/components/home/guides-gallery'
+import { HomeHero } from '@/components/home/home-hero'
+import { NeedsOrbit } from '@/components/home/needs-orbit'
+import { RolePanels } from '@/components/home/role-panels'
+import { SafeguardList } from '@/components/home/safeguard-list'
+import { StatsBand } from '@/components/home/stats-band'
+import { Faq } from '@/components/landing/faq'
 import { FinalCta } from '@/components/landing/final-cta'
-import { Hero } from '@/components/landing/hero'
-import { Highlights } from '@/components/landing/highlights'
 import { JourneySection } from '@/components/landing/journey-section'
-import { RolesBento } from '@/components/landing/roles-bento'
 import { SectionHeading } from '@/components/landing/section-heading'
 
 const TITLE = 'AidBridge | Disaster response and relief coordination'
@@ -16,34 +23,65 @@ export const metadata: Metadata = {
   openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: 'AidBridge' },
 }
 
-// The landing page: five parts. The sections are Server Components; only the animated leaves (the
-// radar, the bento drawings, the request journey and the scroll reveals) ship JavaScript.
+// The home page: a hero with a slider and ten sections after it, each laid out differently on purpose
+// (an inverted number band, a bento, the request journey, expanding role panels, an orbit with a
+// ticker, a gallery, an editorial list, an alert panel with a timeline, a split FAQ and a closing
+// band). Most are Server Components; the hero, the role panels, the guide dialog, the journey and the
+// FAQ accordion need the browser. The older design is still at /classic.
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <Highlights />
+      <HomeHero />
+      <StatsBand />
+      <FeatureBento />
 
-      <section aria-labelledby="journey-heading" className="border-y bg-card/50 py-20">
+      <section
+        id="how-it-works"
+        aria-labelledby="journey-heading"
+        className="scroll-mt-20 border-y bg-card/50 py-16 sm:py-20"
+      >
         <div className="page-container">
           <SectionHeading
             id="journey-heading"
-            eyebrow="Follow a request"
-            title="What each person sees, at every stage"
-            text="Pick a stage, or just watch: one request moves from pending to closed while you see what the person in need, the volunteer and the admins experience."
+            eyebrow="How it works"
+            title="Follow one request from first call to last delivery"
+            text="Pick a stage, or just watch: a request moves from pending to closed while you see what the person in need, the volunteer and the admins experience."
           />
           <JourneySection />
         </div>
       </section>
 
-      <section aria-labelledby="roles-heading" className="page-container py-20">
-        <SectionHeading
-          id="roles-heading"
-          eyebrow="Who it is for"
-          title="Four roles, one shared picture"
-          text="People sign up to ask for help, and can apply to volunteer. NGO and admin accounts are created by an admin."
-        />
-        <RolesBento />
+      <RolePanels />
+      <NeedsOrbit />
+      <GuidesGallery />
+      <SafeguardList />
+      <EmergencySection />
+
+      <section
+        id="faq"
+        aria-labelledby="faq-heading"
+        className="scroll-mt-20 border-t py-16 sm:py-20"
+      >
+        <div className="page-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <SectionHeading
+              id="faq-heading"
+              eyebrow="Questions"
+              title="Good to know before you start"
+              text="Short answers to what people ask first."
+            />
+            <p className="mt-6 text-sm text-muted-foreground">
+              Something else?{' '}
+              <Link
+                href="/contact"
+                className="inline-flex min-h-11 items-center font-semibold text-link hover:underline"
+              >
+                Send us a message
+              </Link>
+            </p>
+          </div>
+          <Faq className="" />
+        </div>
       </section>
 
       <FinalCta />

@@ -36,8 +36,14 @@ export type NavEntry =
   // 'description': label plus a short line. 'icon': label with an icon.
   | { type: 'menu'; label: string; layout: 'description' | 'icon'; items: readonly NavItem[] }
 
+// The links point at sections of the home page for now (/#id); Part "public site" replaces them with
+// real pages (explore, guides, status) as those are built. Logged in or out, the navbar lists the same
+// links; the profile menu is what changes.
 export const PUBLIC_NAV: readonly NavEntry[] = [
   { type: 'link', href: '/', label: 'Home' },
+  { type: 'link', href: '/#how-it-works', label: 'How it works' },
+  { type: 'link', href: '/#guides', label: 'Guides' },
+  { type: 'link', href: '/#faq', label: 'FAQ' },
   {
     type: 'menu',
     label: 'About',

@@ -266,6 +266,18 @@
   }
 }
 
+/* The home page's disaster ticker (components/home/marquee.tsx): its track holds the list twice, so
+   sliding half its width loops without a jump. */
+@keyframes home-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-home-marquee {
+  animation: home-marquee 40s linear infinite;
+}
+
 /* Leaflet maps (components/shared/location-map-canvas.tsx), kept inside the theme tokens. */
 .leaflet-container {
   font-family: inherit;

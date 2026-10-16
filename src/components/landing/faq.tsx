@@ -8,12 +8,12 @@ import { FAQ } from './landing-content'
 // An accordion that opens one answer at a time. Each question is a real button (expanded state and
 // the panel it controls are announced), and the answer slides open with a grid-row transition that the
 // global reduced-motion rule switches off.
-export function Faq() {
+export function Faq({ className = 'mx-auto mt-12 max-w-3xl' }: { className?: string }) {
   const baseId = useId()
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <ul className="mx-auto mt-12 flex max-w-3xl flex-col gap-3">
+    <ul className={cn('flex flex-col gap-3', className)}>
       {FAQ.map((item, index) => {
         const expanded = open === index
         const buttonId = `${baseId}-q${index}`
