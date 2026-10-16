@@ -45,3 +45,38 @@ export type AssignedCamp = Omit<CampSummary, 'ngo'> & {
   isActive: boolean
   inventory: StockItem[]
 }
+
+// A camp as its NGO (or an admin) sees it: GET /camps, and what every camp write answers with.
+export type ManagedCamp = {
+  id: string
+  ngo: { id: string; name: string }
+  name: string
+  location: GeoPoint
+  address: string | null
+  capacity: number
+  currentOccupancy: number
+  availableSpots: number
+  isActive: boolean
+  assignedVolunteers: { id: string; name: string; phone: string | null }[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type CampListParams = PaginationParams & {
+  isActive?: boolean
+}
+
+// POST /camps. The owner is the caller; any other field (ngo, assignedVolunteers) is a 400.
+export type CreateCampPayload = {
+  name: string
+  // [lng, lat]
+  coordinates: [number, number]
+  address?: string
+  capacity: number
+  currentOccupancy?: number
+  isActive?: boolean
+}
+
+// PUT /camps/:id takes only what changed; an empty body or an unknown field is a 400. A capacity below
+// the people already in the camp is a 409.
+export type UpdateCampPayload = Partial<CreateCampPayload>

@@ -2,8 +2,12 @@
 
 import { Check, Droplets, type LucideIcon, Pill, Plus, Shirt, Tent, Utensils } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { getReliefLabel, RELIEF_LABEL } from '@/lib/relief'
 import { cn } from '@/lib/utils'
 import { ReliefCategory } from '@/types/enums'
+
+// Server Components cannot call functions from this client file, so the labels live in lib/relief.ts.
+export { getReliefLabel }
 
 // The six kinds of relief, shared by SOS "needs" and inventory categories: one label and icon each.
 export const RELIEF_CATEGORY_OPTIONS: readonly {
@@ -11,19 +15,15 @@ export const RELIEF_CATEGORY_OPTIONS: readonly {
   label: string
   icon: LucideIcon
 }[] = [
-  { value: ReliefCategory.FOOD, label: 'Food', icon: Utensils },
-  { value: ReliefCategory.MEDICINE, label: 'Medicine', icon: Pill },
-  { value: ReliefCategory.SHELTER, label: 'Shelter', icon: Tent },
-  { value: ReliefCategory.WATER, label: 'Water', icon: Droplets },
-  { value: ReliefCategory.CLOTHING, label: 'Clothing', icon: Shirt },
-  { value: ReliefCategory.OTHER, label: 'Other', icon: Plus },
+  { value: ReliefCategory.FOOD, label: RELIEF_LABEL.food, icon: Utensils },
+  { value: ReliefCategory.MEDICINE, label: RELIEF_LABEL.medicine, icon: Pill },
+  { value: ReliefCategory.SHELTER, label: RELIEF_LABEL.shelter, icon: Tent },
+  { value: ReliefCategory.WATER, label: RELIEF_LABEL.water, icon: Droplets },
+  { value: ReliefCategory.CLOTHING, label: RELIEF_LABEL.clothing, icon: Shirt },
+  { value: ReliefCategory.OTHER, label: RELIEF_LABEL.other, icon: Plus },
 ]
 
 const OPTION_BY_VALUE = new Map(RELIEF_CATEGORY_OPTIONS.map((option) => [option.value, option]))
-
-export function getReliefLabel(category: ReliefCategory) {
-  return OPTION_BY_VALUE.get(category)?.label ?? category
-}
 
 // "Food, Water and Shelter", for a sentence or a table cell.
 export function formatReliefList(categories: readonly ReliefCategory[]) {

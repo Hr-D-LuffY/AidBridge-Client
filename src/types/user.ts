@@ -51,3 +51,22 @@ export type UpdateProfilePayload = {
   location?: [number, number]
   isAvailable?: boolean
 }
+
+// A volunteer as an NGO sees them (GET /users?role=volunteer): the limited profile plus the contact
+// details it needs to coordinate camps.
+export type VolunteerContact = {
+  id: string
+  name: string
+  role: Role
+  isAvailable: boolean
+  reliabilityScore: number
+  totalRatings: number
+  email: string
+  phone: string | null
+}
+
+export type VolunteerListParams = {
+  page?: number
+  limit?: number
+  role: 'volunteer'
+}

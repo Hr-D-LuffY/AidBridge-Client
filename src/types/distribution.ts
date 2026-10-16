@@ -1,3 +1,4 @@
+import type { PaginationParams } from './api'
 import type { ReliefCategory } from './enums'
 
 // POST /distribution. The recipient is always the task's victim and the time is the server's, so
@@ -27,4 +28,13 @@ export type Distribution = {
   }
   notes: string | null
   distributedAt: string
+}
+
+// GET /distribution (NGO: its own camps' hand-outs, admin: all). `from` and `to` are dates (yyyy-mm-dd);
+// a bare `to` covers that whole day.
+export type DistributionListParams = PaginationParams & {
+  camp?: string
+  volunteer?: string
+  from?: string
+  to?: string
 }

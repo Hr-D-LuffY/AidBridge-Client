@@ -49,6 +49,8 @@ export const POLL_INTERVAL_MS = {
   // A volunteer waiting for work: new requests appear without a reload.
   nearby: 30_000,
   notifications: 30_000,
+  // An NGO watching camps and open requests on the live map.
+  liveMap: 30_000,
 } as const
 
 // Chat: the backend caps a message at 500 characters and a page at 100 (newest first).
@@ -81,6 +83,21 @@ export const NEARBY_PAGE_SIZE = 50
 export const TASK_HISTORY_PAGE_SIZE = 10
 export const DISTRIBUTION_NOTES_MAX_LENGTH = 500
 export const MAX_STOCK_QUANTITY = 1_000_000_000
+
+// NGOs (backend: constants/camp.ts, constants/inventory.ts).
+export const CAMP_NAME_MIN_LENGTH = 2
+export const CAMP_NAME_MAX_LENGTH = 100
+export const CAMP_ADDRESS_MAX_LENGTH = 300
+export const MAX_CAMP_CAPACITY = 1_000_000
+export const ITEM_NAME_MAX_LENGTH = 100
+export const ITEM_UNIT_MAX_LENGTH = 20
+export const DEFAULT_LOW_STOCK_THRESHOLD = 10
+export const DEFAULT_STOCK_UNIT = 'units'
+export const NGO_PAGE_SIZE = 10
+// How many low-stock items and recent hand-outs the overview lists before linking to the full page.
+export const OVERVIEW_PREVIEW_SIZE = 5
+// The people a camp's check-in buttons add or remove at once.
+export const OCCUPANCY_STEPS = [-10, -1, 1, 10] as const
 
 // SOS media rules (backend: constants/sos.ts). Checked in the browser first so a bad file is
 // refused before the upload starts.

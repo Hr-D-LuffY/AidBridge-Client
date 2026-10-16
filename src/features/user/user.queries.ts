@@ -1,11 +1,13 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { authApi } from '@/lib/api/client'
-import type { UpdateProfilePayload } from '@/types'
+import { MAX_PAGE_SIZE } from '@/lib/constants'
+import type { UpdateProfilePayload, VolunteerListParams } from '@/types'
 import { userApi } from './user.api'
+import { userKeys } from './user.keys'
 import type { ChangePasswordBody } from './user.schema'
 
 // Saves some of the user's own details. The profile lives in the area layout (SessionProvider), so
@@ -42,5 +44,17 @@ export function useDeleteAccount() {
     },
     meta: { skipGlobalError: true },
     onSuccess: () => window.location.assign('/login'),
+  })
+}
+
+// Every volunteer is asked for at once (a camp team and the hand-out filter pick from the same list), so
+// the first 100 are read. `enabled` keeps a closed form or an unused filter from asking.
+const VOLUNTEER_PARAMS: VolunteerListParams = { role: 'volunteer', limit: MAX_PAGE_SIZE }
+
+export function useVolunteersQuery(enabled = true) {
+  return useQuery({
+    queryKey: userKeys.volunteers(VOLUNTEER_PARAMS),
+    queryFn: ({ signal }) => userApi.volunteers(VOLUNTEER_PARAMS, signal),
+    enabled,
   })
 }
