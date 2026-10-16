@@ -9,7 +9,7 @@ import { getFieldError } from './use-field-error'
 
 type TextFieldProps = {
   label: string
-  type?: 'text' | 'email' | 'tel'
+  type?: 'text' | 'email' | 'tel' | 'date'
   placeholder?: string
   autoComplete?: string
   // Picks the mobile keyboard (a number pad for an amount) without the quirks of type="number".

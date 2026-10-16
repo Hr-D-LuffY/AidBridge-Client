@@ -7,6 +7,7 @@ import { getErrorMessage, isApiError } from '@/lib/api/errors'
 import {
   type CreateSosPayload,
   type NearbySosParams,
+  type Priority,
   type SosListParams,
   type SosRequest,
   SosStatus,
@@ -195,6 +196,19 @@ export function useResolveSos(id: string) {
     onSuccess: (sos) => {
       syncSos(sos)
       toast.success('Your request is closed.')
+    },
+  })
+}
+
+// Admin: changes how urgent a request is. The answer replaces the request in the cache and every list is
+// read again, since a list may be filtered by priority.
+export function useSetSosPriority(id: string) {
+  const syncSos = useSyncSos()
+  return useMutation({
+    mutationFn: (priority: Priority) => sosApi.setPriority(id, priority),
+    onSuccess: (sos) => {
+      syncSos(sos)
+      toast.success('Priority changed.')
     },
   })
 }

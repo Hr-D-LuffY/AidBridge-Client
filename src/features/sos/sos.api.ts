@@ -5,6 +5,7 @@ import type {
   CreateSosPayload,
   NearbySos,
   NearbySosParams,
+  Priority,
   RejectSosResult,
   SosListParams,
   SosRequest,
@@ -39,4 +40,8 @@ export const sosApi = {
   accept: (id: string) => clientApi.put<AcceptSosResult>(`/sos/${id}/accept`),
   // "No thanks" on a request that is not yours, or backing out of one you accepted but have not set off on.
   reject: (id: string) => clientApi.put<RejectSosResult>(`/sos/${id}/reject`),
+
+  // Admin: how urgent the request is. Volunteers see it in the order of urgency on their map.
+  setPriority: (id: string, priority: Priority) =>
+    clientApi.put<SosRequest>(`/sos/${id}/priority`, { priority }),
 }

@@ -1,4 +1,5 @@
 import type { PaginationParams } from './api'
+import type { NotificationTarget } from './enums'
 
 export type AppNotification = {
   id: string
@@ -14,4 +15,13 @@ export type AppNotification = {
 
 export type NotificationListParams = PaginationParams & {
   unread?: boolean
+}
+
+// POST /notifications (admin). `all` stands alone; an emergency broadcast also sends an email to every
+// active account in the chosen roles.
+export type CreateNotificationPayload = {
+  title: string
+  message: string
+  targetRoles: NotificationTarget[]
+  isEmergencyBroadcast: boolean
 }

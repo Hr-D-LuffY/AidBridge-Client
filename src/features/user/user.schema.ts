@@ -67,3 +67,20 @@ export const changePasswordBodySchema = z.object({
 })
 
 export type ChangePasswordBody = z.output<typeof changePasswordBodySchema>
+
+// "Add an account" (admin): an NGO or another admin. The admin chooses the first password and hands it
+// over, so it is typed once and can be shown. Phone is optional and stays plain text (blank allowed).
+export const createAccountFormSchema = z.object({
+  name: nameField,
+  email: z.email('A valid email is required').toLowerCase(),
+  role: z.string().refine((value) => value === 'ngo' || value === 'admin', 'Choose a role'),
+  phone: z
+    .string()
+    .trim()
+    .refine((value) => value === '' || PHONE_PATTERN.test(value), {
+      message: 'Phone must be 7-15 digits, optionally starting with +',
+    }),
+  password: newPasswordSchema,
+})
+
+export type CreateAccountFormInput = z.input<typeof createAccountFormSchema>

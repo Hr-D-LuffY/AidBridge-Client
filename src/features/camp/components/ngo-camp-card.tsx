@@ -19,6 +19,8 @@ const stepName = (step: number, camp: string) => {
 
 type NgoCampCardProps = {
   camp: ManagedCamp
+  // Names the NGO that runs the camp (an admin sees camps of every NGO).
+  showNgo?: boolean
   onEdit: () => void
   onDelete: () => void
   onAssign: () => void
@@ -27,7 +29,13 @@ type NgoCampCardProps = {
 // One camp as the NGO that runs it sees it: how full it is with check-in buttons, the volunteers on its
 // team, and the actions. A check-in changes the count at once and goes back if the server refuses; a
 // step that would pass the capacity or go below zero is off, so it is never offered in the first place.
-export function NgoCampCard({ camp, onEdit, onDelete, onAssign }: NgoCampCardProps) {
+export function NgoCampCard({
+  camp,
+  showNgo = false,
+  onEdit,
+  onDelete,
+  onAssign,
+}: NgoCampCardProps) {
   const changeOccupancy = useChangeOccupancy()
   const unassign = useUnassignVolunteer(camp.id)
   const full = isCampFull(camp)
@@ -48,6 +56,7 @@ export function NgoCampCard({ camp, onEdit, onDelete, onAssign }: NgoCampCardPro
               {camp.isActive ? 'Open' : 'Closed'}
             </Badge>
           </h3>
+          {showNgo && <p className="text-sm text-muted-foreground">Run by {camp.ngo.name}</p>}
           {camp.address && <p className="text-sm text-muted-foreground">{camp.address}</p>}
         </div>
         <a

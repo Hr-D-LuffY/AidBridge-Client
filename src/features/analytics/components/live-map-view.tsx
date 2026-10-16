@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPinned, Siren, Tent } from 'lucide-react'
+import { ArrowRight, MapPinned, Siren, Tent } from 'lucide-react'
 import { useState } from 'react'
 import { EmptyState } from '@/components/shared/empty-state'
 import { ListErrorState } from '@/components/shared/list-error-state'
@@ -11,6 +11,7 @@ import { ReliefBadges } from '@/components/shared/relief-category'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { OccupancyBar } from '@/features/camp/components/occupancy-bar'
+import { SosDetailSheet } from '@/features/sos/components/sos-detail-sheet'
 import { usePolling } from '@/hooks/use-polling'
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
 import { POLL_INTERVAL_MS } from '@/lib/constants'
@@ -34,10 +35,12 @@ function RequestCard({
   request,
   selected,
   onShowOnMap,
+  onOpen,
 }: {
   request: LiveMapRequest
   selected: boolean
   onShowOnMap: () => void
+  onOpen: () => void
 }) {
   return (
     <li
@@ -61,11 +64,18 @@ function RequestCard({
           : 'No volunteer yet'}{' '}
         · raised {formatRelativeTime(request.createdAt)}
       </p>
-      <button type="button" onClick={onShowOnMap} className={cn(SHOW_ON_MAP, 'mt-auto w-fit')}>
-        <MapPinned aria-hidden="true" className="size-4" />
-        Show on map
-        <span className="sr-only"> the request from {request.victim.name}</span>
-      </button>
+      <div className="mt-auto flex flex-wrap gap-x-4">
+        <button type="button" onClick={onOpen} className={cn(SHOW_ON_MAP, 'font-semibold')}>
+          View details
+          <ArrowRight aria-hidden="true" className="size-4" />
+          <span className="sr-only"> of the request from {request.victim.name}</span>
+        </button>
+        <button type="button" onClick={onShowOnMap} className={SHOW_ON_MAP}>
+          <MapPinned aria-hidden="true" className="size-4" />
+          Show on map
+          <span className="sr-only"> the request from {request.victim.name}</span>
+        </button>
+      </div>
     </li>
   )
 }
@@ -127,19 +137,27 @@ function ListSkeleton() {
 
 // What is happening right now, on one map: open relief camps (green, amber when full) and open requests
 // (a triangle coloured by priority). Asked again every 30 seconds. A map is never the only way, so every
-// request and camp is also listed below it; "Show on map" centres the map on one. There are no phone
-// numbers here: the backend does not send any.
+// request and camp is also listed below it; "Show on map" centres the map on one. Clicking a request on
+// the map, or "View details" on its card, opens the whole request in a panel (the live map's own data has
+// no phone numbers, the request's full view does).
 export function LiveMapView() {
   const poll = usePolling(POLL_INTERVAL_MS.liveMap)
   const query = useLiveMapQuery(poll)
   const reduceMotion = usePrefersReducedMotion()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // The request whose details are open in the side panel.
+  const [openId, setOpenId] = useState<string | null>(null)
 
   const requests = query.data?.requests ?? []
   const camps = query.data?.camps ?? []
   const critical = requests.filter((request) => request.priority === Priority.CRITICAL).length
   const full = camps.filter(isLiveCampFull).length
   const empty = query.data !== undefined && requests.length === 0 && camps.length === 0
+
+  function openRequest(id: string) {
+    setSelectedId(id)
+    setOpenId(id)
+  }
 
   // From a list: pick the place and bring the map into view so the user sees where it is.
   function showOnMap(id: string) {
@@ -173,6 +191,7 @@ export function LiveMapView() {
               request={request}
               selected={request.id === selectedId}
               onShowOnMap={() => showOnMap(request.id)}
+              onOpen={() => openRequest(request.id)}
             />
           ))}
         </ul>
@@ -202,7 +221,7 @@ export function LiveMapView() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Live map"
-        description="Open relief camps and requests for help, right now. Hover a pin for its details. The map refreshes by itself every 30 seconds."
+        description="Open relief camps and requests for help, right now. Hover a pin for a summary and click a request for all its details. The map refreshes by itself every 30 seconds."
       />
 
       <section
@@ -232,6 +251,7 @@ export function LiveMapView() {
           legend={LIVE_MAP_LEGEND}
           selectedId={selectedId}
           onSelect={setSelectedId}
+          onOpen={openRequest}
           emptyNote={
             empty ? (
               <>
@@ -257,6 +277,17 @@ export function LiveMapView() {
           </h2>
           {campList}
         </section>
+      )}
+
+      {openId && (
+        <SosDetailSheet
+          key={openId}
+          id={openId}
+          open
+          onOpenChange={(open) => {
+            if (!open) setOpenId(null)
+          }}
+        />
       )}
     </div>
   )

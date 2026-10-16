@@ -18,7 +18,6 @@ import type { InventoryItem } from '@/types'
 import { parseInventoryParams, toInventoryQuery } from '../inventory.params'
 import { useDeleteItem, useInventoryQuery } from '../inventory.queries'
 import { ItemFormSheet } from './item-form-sheet'
-import { QuantityEditor } from './quantity-editor'
 
 // null: the sheet is closed. 'new': adding. An item: editing it.
 type SheetTarget = 'new' | InventoryItem | null
@@ -26,8 +25,9 @@ type SheetTarget = 'new' | InventoryItem | null
 const LOW_OPTIONS = [{ value: 'low', label: 'Running low' }] as const
 
 // The NGO's stock: what it holds, where, and how much. Filters (camp, category, running low) and the page
-// live in the URL. The amount is edited in the row; everything else in a sheet. Whether an item is
-// running low comes from the backend (`isLow`), never from a comparison made here.
+// live in the URL. Everything, the amount included, is changed through Edit, so a number cannot be
+// changed by a stray keystroke. Whether an item is running low comes from the backend (`isLow`), never
+// from a comparison made here.
 export function InventoryView() {
   const params = useQueryParams()
   const view = parseInventoryParams({
@@ -77,7 +77,15 @@ export function InventoryView() {
           <span className="text-muted-foreground">General store</span>
         ),
     },
-    { id: 'quantity', header: 'In stock', cell: (item) => <QuantityEditor item={item} /> },
+    {
+      id: 'quantity',
+      header: 'In stock',
+      cell: (item) => (
+        <span className="tabular-nums">
+          <span className="font-semibold">{item.quantity}</span> {item.unit}
+        </span>
+      ),
+    },
     {
       id: 'threshold',
       header: 'Low at',

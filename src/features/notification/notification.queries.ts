@@ -1,7 +1,13 @@
 'use client'
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AppNotification, NotificationListParams, Paginated } from '@/types'
+import { toast } from 'sonner'
+import type {
+  AppNotification,
+  CreateNotificationPayload,
+  NotificationListParams,
+  Paginated,
+} from '@/types'
 import { notificationApi } from './notification.api'
 import { notificationKeys } from './notification.keys'
 
@@ -65,6 +71,23 @@ export function useMarkNotificationRead() {
         queryClient.setQueryData(notificationKeys.unreadCount(), context.count)
       }
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: notificationKeys.all }),
+  })
+}
+
+// Admin: sends a broadcast. The composer shows its own errors, so the global toast is off. The history and
+// the bell are read again, since the admin may be among the recipients.
+export function useSendBroadcast() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: CreateNotificationPayload) => notificationApi.create(payload),
+    meta: { skipGlobalError: true },
+    onSuccess: (_notification, { isEmergencyBroadcast }) =>
+      toast.success(
+        isEmergencyBroadcast
+          ? 'Emergency broadcast sent. The emails are going out now.'
+          : 'Notification sent.',
+      ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: notificationKeys.all }),
   })
 }

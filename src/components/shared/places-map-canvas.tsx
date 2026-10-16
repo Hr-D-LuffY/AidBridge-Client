@@ -35,6 +35,9 @@ export type MapPlace = {
   // Where the place's own page is. The map does not follow it: the page that owns the map decides
   // what a click does (onOpen gets the id), so it can look the address up here.
   href?: string
+  // False for a place that has nothing to open when the map has `onOpen` (a camp on a map where only
+  // the requests have a details view). The card then shows no "click for details" line.
+  openable?: boolean
   // The card that opens on hover or tap: label and value rows, and a last row with a coloured dot.
   rows?: readonly PlaceRow[]
   status?: PlaceStatus
@@ -292,6 +295,7 @@ export function PlacesMapCanvas({
 
           {places.map((place) => {
             const selected = place.id === selectedId
+            const canOpen = Boolean(onOpen) && place.openable !== false
             return (
               <Marker
                 key={place.id}
@@ -300,7 +304,7 @@ export function PlacesMapCanvas({
                 zIndexOffset={selected ? 1000 : 0}
                 eventHandlers={{
                   click: (event) => {
-                    if (!onOpen || (!hasHover && !selected)) {
+                    if (!onOpen || !canOpen || (!hasHover && !selected)) {
                       onSelect?.(place.id)
                       if (!hasHover) (event.target as L.Marker).openTooltip()
                       return
@@ -318,7 +322,7 @@ export function PlacesMapCanvas({
                     rows={place.rows ?? [{ label: 'Place', value: place.name }]}
                     status={place.status}
                     hint={
-                      onOpen
+                      canOpen
                         ? hasHover
                           ? 'Click for full details →'
                           : 'Tap again for full details →'

@@ -17,6 +17,12 @@ export type UserProfile = {
   email: string
   phone?: string | null
   location: GeoPoint | null
+  // An admin can block an account. Only an admin (or the user themself, who cannot be blocked while
+  // reading it) gets this profile, so these are what the admin's Users pages show.
+  isBlocked?: boolean
+  blockedAt?: string | null
+  // Written by the admin who blocked it, for other admins. Never shown to the blocked person.
+  blockReason?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -69,4 +75,22 @@ export type VolunteerListParams = {
   page?: number
   limit?: number
   role: 'volunteer'
+}
+
+// GET /users. An admin gets full profiles; an NGO gets the limited one (see VolunteerContact).
+export type UserListParams = {
+  page?: number
+  limit?: number
+  role?: Role
+  // Admin only: true lists the blocked accounts, false the others.
+  blocked?: boolean
+}
+
+// POST /users (admin): an NGO or another admin. The admin picks the first password and hands it over.
+export type CreateAccountPayload = {
+  name: string
+  email: string
+  password: string
+  role: 'ngo' | 'admin'
+  phone?: string
 }

@@ -1,6 +1,8 @@
 import { authApi, clientApi } from '@/lib/api/client'
 import type {
+  CreateAccountPayload,
   UpdateProfilePayload,
+  UserListParams,
   UserProfile,
   VolunteerContact,
   VolunteerListParams,
@@ -19,4 +21,16 @@ export const userApi = {
   // The volunteers an NGO or admin can work with, with the contact details they need (GET /users).
   volunteers: (params: VolunteerListParams, signal?: AbortSignal) =>
     clientApi.getList<VolunteerContact>('/users', params, signal),
+
+  // Admin: every account, with its full profile.
+  list: (params: UserListParams, signal?: AbortSignal) =>
+    clientApi.getList<UserProfile>('/users', params, signal),
+  // Admin: blocks an account. It cannot log in at once and its session ends on its next request; for a
+  // victim the unfinished requests are closed too. 403 for an admin account, 409 if already blocked.
+  block: (id: string, reason?: string) =>
+    clientApi.put<UserProfile>(`/users/${id}/block`, reason ? { reason } : {}),
+  // Admin: lifts the block. 409 if the account is not blocked.
+  unblock: (id: string) => clientApi.put<UserProfile>(`/users/${id}/unblock`),
+  // Admin: creates an NGO or another admin. No token comes back, and the admin hands the password over.
+  createAccount: (payload: CreateAccountPayload) => clientApi.post<UserProfile>('/users', payload),
 }

@@ -102,8 +102,9 @@ const COLUMNS: DataTableColumn<Distribution>[] = [
 
 // The hand-out history, newest first: what was given, to whom, from which camp and by which volunteer.
 // An NGO sees only hand-outs from its own camps. Camp, volunteer and dates filter it, and everything
-// (filters and page) lives in the URL. Victims' phone numbers are never part of it.
-export function DistributionHistoryView() {
+// (filters and page) lives in the URL. Victims' phone numbers are never part of it. An admin sees the
+// hand-outs of every camp instead of only their own.
+export function DistributionHistoryView({ admin = false }: { admin?: boolean }) {
   const params = useQueryParams()
   const view = parseDistributionParams({
     page: params.get('page'),
@@ -123,7 +124,11 @@ export function DistributionHistoryView() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Distribution"
-        description="Every hand-out from your camps: what was given, to whom, and by which volunteer. Stock comes off at the moment of the hand-out."
+        description={
+          admin
+            ? 'Every hand-out from every camp: what was given, to whom, and by which volunteer.'
+            : 'Every hand-out from your camps: what was given, to whom, and by which volunteer. Stock comes off at the moment of the hand-out.'
+        }
       />
 
       <div className="flex flex-col gap-4 rounded-2xl border bg-card p-4">
@@ -207,7 +212,7 @@ export function DistributionHistoryView() {
             <EmptyState
               icon={Truck}
               title="Nothing handed out yet"
-              description="When a volunteer hands out stock from one of your camps, the record shows up here."
+              description={`When a volunteer hands out stock from ${admin ? 'a camp' : 'one of your camps'}, the record shows up here.`}
             />
           )
         }

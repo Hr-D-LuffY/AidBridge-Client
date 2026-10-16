@@ -24,7 +24,10 @@ type FormTarget = 'new' | ManagedCamp | null
 // The camps an NGO runs: how full each is, who works there, and the actions to change them. Open camps
 // come first. The page is in the URL. Adding, editing and assigning happen in sheets so the list stays
 // in view; a camp's id is kept (not the camp) for the sheets that must show the latest team.
-export function NgoCampsView() {
+//
+// An admin sees every NGO's camps here and can change any of them, but cannot add one: a camp belongs
+// to the NGO that creates it, so `admin` hides "Add camp" and says whose each camp is.
+export function NgoCampsView({ admin = false }: { admin?: boolean }) {
   const params = useQueryParams()
   const query = useManagedCampsQuery(toManagedCampsQuery(params.get('page')))
   const remove = useDeleteCamp()
@@ -53,12 +56,18 @@ export function NgoCampsView() {
       <EmptyState
         icon={Tent}
         title="No camps yet"
-        description="Add a relief camp so victims nearby can find it, and volunteers can be assigned to hand out its stock."
+        description={
+          admin
+            ? 'No NGO has added a relief camp yet. Camps are added by the NGO that runs them.'
+            : 'Add a relief camp so victims nearby can find it, and volunteers can be assigned to hand out its stock.'
+        }
         action={
-          <Button type="button" className="h-10 gap-2 px-4" onClick={() => setForm('new')}>
-            <Plus aria-hidden="true" />
-            Add your first camp
-          </Button>
+          admin ? undefined : (
+            <Button type="button" className="h-10 gap-2 px-4" onClick={() => setForm('new')}>
+              <Plus aria-hidden="true" />
+              Add your first camp
+            </Button>
+          )
         }
       />
     )
@@ -70,6 +79,7 @@ export function NgoCampsView() {
             <li key={camp.id}>
               <NgoCampCard
                 camp={camp}
+                showNgo={admin}
                 onEdit={() => setForm(camp)}
                 onDelete={() => setToDelete(camp)}
                 onAssign={() => setAssignId(camp.id)}
@@ -92,12 +102,18 @@ export function NgoCampsView() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Camps"
-        description="The relief camps you run. Keep the head count up to date, put volunteers on the team and close a camp when it is no longer needed."
+        description={
+          admin
+            ? 'Every relief camp on the platform, whichever NGO runs it. You can change the head count, edit, assign volunteers or delete any of them.'
+            : 'The relief camps you run. Keep the head count up to date, put volunteers on the team and close a camp when it is no longer needed.'
+        }
         actions={
-          <Button type="button" className="h-11 gap-2 px-5" onClick={() => setForm('new')}>
-            <Plus aria-hidden="true" />
-            Add camp
-          </Button>
+          admin ? undefined : (
+            <Button type="button" className="h-11 gap-2 px-5" onClick={() => setForm('new')}>
+              <Plus aria-hidden="true" />
+              Add camp
+            </Button>
+          )
         }
       />
 
@@ -129,7 +145,7 @@ export function NgoCampsView() {
           if (!open) setToDelete(null)
         }}
         title={`Delete ${toDelete?.name ?? 'this camp'}?`}
-        description="The camp disappears from every list and map, and its volunteers lose it. Its stock is kept and goes back to your general store. This cannot be undone."
+        description={`The camp disappears from every list and map, and its volunteers lose it. Its stock is kept and goes back to ${admin ? "the NGO's" : 'your'} general store. This cannot be undone.`}
         confirmLabel="Delete camp"
         cancelLabel="Keep camp"
         pending={remove.isPending}

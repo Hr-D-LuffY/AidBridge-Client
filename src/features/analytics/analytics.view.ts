@@ -51,6 +51,8 @@ export function toLiveCampPlace(camp: LiveMapCamp): MapPlace {
     position: fromGeoPoint(camp.location),
     tone: full ? 'full' : 'open',
     glyph: 'house',
+    // A camp has no page of its own to open here; only a request has details.
+    openable: false,
     rows: [
       { label: 'Camp', value: camp.name },
       { label: 'NGO', value: camp.ngo.name },

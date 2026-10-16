@@ -1,11 +1,16 @@
 'use client'
 
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { authApi } from '@/lib/api/client'
 import { MAX_PAGE_SIZE } from '@/lib/constants'
-import type { UpdateProfilePayload, VolunteerListParams } from '@/types'
+import type {
+  CreateAccountPayload,
+  UpdateProfilePayload,
+  UserListParams,
+  VolunteerListParams,
+} from '@/types'
 import { userApi } from './user.api'
 import { userKeys } from './user.keys'
 import type { ChangePasswordBody } from './user.schema'
@@ -56,5 +61,58 @@ export function useVolunteersQuery(enabled = true) {
     queryKey: userKeys.volunteers(VOLUNTEER_PARAMS),
     queryFn: ({ signal }) => userApi.volunteers(VOLUNTEER_PARAMS, signal),
     enabled,
+  })
+}
+
+// A page of accounts (admin). The role filter and page live in the URL, so a change keeps the old rows on
+// screen until the new ones arrive.
+export function useUsersQuery(params: UserListParams) {
+  return useQuery({
+    queryKey: userKeys.list(params),
+    queryFn: ({ signal }) => userApi.list(params, signal),
+    placeholderData: keepPreviousData,
+  })
+}
+
+// Creates an NGO or admin account. The form shows its own errors (a taken email is a 409), so the global
+// toast is off. The list is read again so the new account shows up.
+export function useCreateAccount() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: CreateAccountPayload) => userApi.createAccount(payload),
+    meta: { skipGlobalError: true },
+    onSuccess: (user) => toast.success(`${user.name}'s account was created.`),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+  })
+}
+
+// Blocks or unblocks an account. The account's own page is a Server Component, so `router.refresh()` reads
+// it again, and the lists are read again for the "Blocked" badge. A 403 (an admin account) or 409 (already
+// in that state) shows the backend's reason in the global toast.
+function useRefreshAfterBlockChange() {
+  const queryClient = useQueryClient()
+  const router = useRouter()
+  return () => {
+    queryClient.invalidateQueries({ queryKey: userKeys.lists() })
+    router.refresh()
+  }
+}
+
+export function useBlockUser() {
+  const refresh = useRefreshAfterBlockChange()
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; name: string; reason?: string }) =>
+      userApi.block(id, reason),
+    onSuccess: (_user, { name }) => toast.success(`${name} was blocked.`),
+    onSettled: refresh,
+  })
+}
+
+export function useUnblockUser() {
+  const refresh = useRefreshAfterBlockChange()
+  return useMutation({
+    mutationFn: ({ id }: { id: string; name: string }) => userApi.unblock(id),
+    onSuccess: (_user, { name }) => toast.success(`${name} can use AidBridge again.`),
+    onSettled: refresh,
   })
 }

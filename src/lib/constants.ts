@@ -111,3 +111,16 @@ export const MEDIA_ACCEPTED_TYPES = [
   'video/quicktime',
   'video/x-msvideo',
 ] as const
+
+// Admins (backend: volunteer-request.interface.ts, constants/incident.ts, constants/notification.ts).
+export const ADMIN_PAGE_SIZE = 10
+export const REVIEW_NOTE_MAX_LENGTH = 500
+export const BLOCK_REASON_MAX_LENGTH = 500
+export const INCIDENT_TITLE_MIN_LENGTH = 3
+export const INCIDENT_TITLE_MAX_LENGTH = 150
+export const INCIDENT_DESCRIPTION_MAX_LENGTH = 2000
+export const INCIDENT_ADDRESS_MAX_LENGTH = 300
+// Requests that can be linked to an incident, or taken off one, in a single call.
+export const MAX_SOS_LINKS_PER_CALL = 50
+export const BROADCAST_TITLE_MAX_LENGTH = 150
+export const BROADCAST_MESSAGE_MAX_LENGTH = 2000

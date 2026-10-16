@@ -7,7 +7,6 @@ import type {
   CreateInventoryPayload,
   InventoryItem,
   InventoryListParams,
-  Paginated,
   UpdateInventoryPayload,
 } from '@/types'
 import { inventoryApi } from './inventory.api'
@@ -63,40 +62,6 @@ export function useDeleteItem() {
   return useMutation({
     mutationFn: (item: Pick<InventoryItem, 'id' | 'itemName'>) => inventoryApi.remove(item.id),
     onSuccess: (_result, item) => toast.success(`${item.itemName} was removed from the stock.`),
-    onSettled: refresh,
-  })
-}
-
-type StockCache = Paginated<InventoryItem>
-
-// Sets the amount in stock from the row itself. The new amount shows at once and goes back if the server
-// refuses (a 409 means a hand-out changed the stock meanwhile, so the number on screen was out of date).
-// Whether the item is now low is the backend's to say: `isLow` is left alone until the list is read
-// again, which happens right after the answer.
-export function useSetQuantity() {
-  const queryClient = useQueryClient()
-  const refresh = useRefreshStock()
-  return useMutation({
-    mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
-      inventoryApi.update(id, { quantity }),
-    onMutate: async ({ id, quantity }) => {
-      await queryClient.cancelQueries({ queryKey: inventoryKeys.lists() })
-      const snapshot = queryClient.getQueriesData<StockCache>({ queryKey: inventoryKeys.lists() })
-      queryClient.setQueriesData<StockCache>(
-        { queryKey: inventoryKeys.lists() },
-        (page) =>
-          page && {
-            ...page,
-            items: page.items.map((item) => (item.id === id ? { ...item, quantity } : item)),
-          },
-      )
-      return { snapshot }
-    },
-    onError: (_error, _variables, context) => {
-      if (!context) return
-      for (const [key, data] of context.snapshot) queryClient.setQueryData(key, data)
-    },
-    onSuccess: (item) => toast.success(`${item.itemName}: ${item.quantity} ${item.unit} in stock.`),
     onSettled: refresh,
   })
 }
