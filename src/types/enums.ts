@@ -134,3 +134,31 @@ export const AuditAction = {
   BROADCAST_SENT: 'broadcast_sent',
 } as const
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+// Which group a notification belongs to (GET /notifications, `category`). The page groups by it.
+export const NotificationCategory = {
+  REQUESTS: 'requests',
+  TASKS: 'tasks',
+  CAMPS: 'camps',
+  SAFETY: 'safety',
+  SYSTEM: 'system',
+} as const
+export type NotificationCategory = (typeof NotificationCategory)[keyof typeof NotificationCategory]
+
+// What a notification is about (GET /notifications, `type`; API.md 11b). Later steps add values, so an
+// item's `type` is typed as a plain string and anything unknown is shown as `general`.
+export const NotificationType = {
+  GENERAL: 'general',
+  BROADCAST: 'broadcast',
+  CHAT_MESSAGE: 'chat_message',
+  SOS_ASSIGNED: 'sos_assigned',
+  SOS_ON_THE_WAY: 'sos_on_the_way',
+  SOS_RESCUED: 'sos_rescued',
+  SOS_UPDATED: 'sos_updated',
+  TASK_CANCELLED: 'task_cancelled',
+  VOLUNTEER_BACKED_OUT: 'volunteer_backed_out',
+  VOLUNTEER_REQUEST_APPROVED: 'volunteer_request_approved',
+  VOLUNTEER_REQUEST_REJECTED: 'volunteer_request_rejected',
+  INVENTORY_LOW: 'inventory_low',
+} as const
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

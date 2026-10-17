@@ -1,14 +1,19 @@
 import type { PaginationParams } from './api'
-import type { NotificationTarget } from './enums'
+import type { NotificationCategory, NotificationTarget, NotificationType } from './enums'
 
 export type AppNotification = {
   id: string
+  // A plain string because later steps add values; an unknown one is shown as `general`.
+  type: NotificationType | (string & {})
+  category: NotificationCategory | (string & {})
   title: string
   message: string
   isEmergencyBroadcast: boolean
   // The request it is about (a chat message), so it can be opened from here. Null for alerts and updates
   // that are not about one request.
   sosRequestId: string | null
+  // The camp it is about (low stock), so it can be opened from here. Null for everything else.
+  campId: string | null
   isRead: boolean
   createdAt: string
 }

@@ -49,6 +49,8 @@ export const POLL_INTERVAL_MS = {
   // A volunteer waiting for work: new requests appear without a reload.
   nearby: 30_000,
   notifications: 30_000,
+  // A volunteer's offers expire in minutes, so their bell looks twice as often (decision A14).
+  volunteerNotifications: 15_000,
   // An NGO watching camps and open requests on the live map.
   liveMap: 30_000,
 } as const
