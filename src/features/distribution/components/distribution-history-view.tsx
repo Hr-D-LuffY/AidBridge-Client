@@ -1,14 +1,13 @@
 'use client'
 
 import { Phone, SearchX, Truck } from 'lucide-react'
-import { useId } from 'react'
 import { DataTable, type DataTableColumn } from '@/components/shared/data-table'
+import { DateFilter } from '@/components/shared/date-filter'
 import { EmptyState } from '@/components/shared/empty-state'
 import { PageHeader } from '@/components/shared/page-header'
 import { getReliefLabel } from '@/components/shared/relief-category'
 import { SelectFilter } from '@/components/shared/select-filter'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useCampOptionsQuery } from '@/features/camp/camp.queries'
 import { useVolunteersQuery } from '@/features/user/user.queries'
 import { useQueryParams } from '@/hooks/use-query-params'
@@ -17,38 +16,6 @@ import { formatDateTime } from '@/lib/format'
 import type { Distribution } from '@/types'
 import { parseDistributionParams, toDistributionQuery } from '../distribution.params'
 import { useDistributionsQuery } from '../distribution.queries'
-
-function DateFilter({
-  label,
-  value,
-  min,
-  max,
-  onChange,
-}: {
-  label: string
-  value: string | undefined
-  min?: string
-  max?: string
-  onChange: (value: string | undefined) => void
-}) {
-  const id = useId()
-  return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
-      <Input
-        id={id}
-        type="date"
-        value={value ?? ''}
-        min={min}
-        max={max}
-        onChange={(event) => onChange(event.target.value || undefined)}
-        className="h-11 text-base md:text-sm"
-      />
-    </div>
-  )
-}
 
 const COLUMNS: DataTableColumn<Distribution>[] = [
   {

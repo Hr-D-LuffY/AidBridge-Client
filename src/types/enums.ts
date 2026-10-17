@@ -93,3 +93,36 @@ export const SosLinkAction = {
   UNLINK: 'unlink',
 } as const
 export type SosLinkAction = (typeof SosLinkAction)[keyof typeof SosLinkAction]
+
+// What an audit entry is about (GET /audit-logs, `targetType`).
+export const AuditTargetType = {
+  USER: 'user',
+  VOLUNTEER_REQUEST: 'volunteer_request',
+  SOS_REQUEST: 'sos_request',
+  INCIDENT: 'incident',
+  CAMP: 'camp',
+  NOTIFICATION: 'notification',
+} as const
+export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType]
+
+// The `action` values the backend records so far (API.md 12b). New ones arrive with later steps, so an
+// entry's `action` is typed as a plain string and the label map falls back for one it does not know.
+export const AuditAction = {
+  ACCOUNT_CREATED: 'account_created',
+  USER_BLOCKED: 'user_blocked',
+  USER_UNBLOCKED: 'user_unblocked',
+  VOLUNTEER_REQUEST_APPROVED: 'volunteer_request_approved',
+  VOLUNTEER_REQUEST_REJECTED: 'volunteer_request_rejected',
+  SOS_PRIORITY_CHANGED: 'sos_priority_changed',
+  INCIDENT_CREATED: 'incident_created',
+  INCIDENT_UPDATED: 'incident_updated',
+  INCIDENT_PRIORITY_CHANGED: 'incident_priority_changed',
+  INCIDENT_SOS_LINKED: 'incident_sos_linked',
+  INCIDENT_SOS_UNLINKED: 'incident_sos_unlinked',
+  INCIDENT_DELETED: 'incident_deleted',
+  CAMP_VOLUNTEER_ASSIGNED: 'camp_volunteer_assigned',
+  CAMP_VOLUNTEER_UNASSIGNED: 'camp_volunteer_unassigned',
+  CAMP_DELETED: 'camp_deleted',
+  BROADCAST_SENT: 'broadcast_sent',
+} as const
+export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

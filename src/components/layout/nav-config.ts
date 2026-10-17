@@ -12,6 +12,7 @@ import {
   Megaphone,
   PackageOpen,
   Radar,
+  ScrollText,
   Siren,
   Tent,
   Truck,
@@ -97,6 +98,7 @@ export const AREA_NAV: Record<Role, readonly AreaNavItem[]> = {
     { href: '/admin/distribution', label: 'Distribution', icon: Truck },
     { href: '/admin/reports', label: 'Reports', icon: ChartColumn },
     { href: '/admin/live-map', label: 'Live map', icon: MapIcon },
+    { href: '/admin/audit', label: 'Audit log', icon: ScrollText },
   ],
 }
 

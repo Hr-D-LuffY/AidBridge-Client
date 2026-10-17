@@ -1,5 +1,6 @@
 export * from './analytics'
 export * from './api'
+export * from './audit'
 export * from './camp'
 export * from './distribution'
 export * from './enums'
