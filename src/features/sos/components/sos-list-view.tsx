@@ -10,14 +10,8 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQueryParams } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
-import {
-  countActiveFilters,
-  parseSosViewParams,
-  SOS_FETCH_PARAMS,
-  SOS_PAGE_SIZE,
-} from '../sos.params'
+import { countActiveFilters, parseSosParams, SOS_PAGE_SIZE, toSosQuery } from '../sos.params'
 import { useSosListQuery } from '../sos.queries'
-import { applySosView } from '../sos.view'
 import { SosCard } from './sos-card'
 import { SosToolbar } from './sos-toolbar'
 
@@ -33,31 +27,33 @@ function RaiseLink() {
   )
 }
 
-// "My requests": one card per request, with search, sort and filters. The whole list is fetched once
-// and everything the user chooses lives in the URL; the server page has already put it in the cache.
+// "My requests": one card per request, with search, sort and filters. The server filters, sorts and pages
+// the list; everything the user chooses lives in the URL, and the server page has already put the first
+// answer in the cache.
 export function SosListView() {
   const params = useQueryParams()
-  const view = parseSosViewParams({
+  const view = parseSosParams({
     page: params.get('page'),
     status: params.get('status'),
     priority: params.get('priority'),
-    need: params.get('need'),
+    needs: params.get('needs'),
     q: params.get('q'),
+    from: params.get('from'),
+    to: params.get('to'),
     sort: params.get('sort'),
   })
-  const query = useSosListQuery(SOS_FETCH_PARAMS)
+  const query = useSosListQuery(toSosQuery(view, SOS_PAGE_SIZE))
 
-  const requests = query.data?.items ?? []
-  const result = applySosView(requests, view)
   const filtered = countActiveFilters(view) > 0
-  const truncated = (query.data?.meta.total ?? 0) > requests.length
+  const total = query.data?.meta.total
+  const clearFilters = () => params.clear('status', 'priority', 'needs', 'q', 'from', 'to')
 
   let body: React.ReactNode
   if (query.isPending) {
     body = <CardsSkeleton />
   } else if (query.isError) {
     body = <ListErrorState onRetry={() => query.refetch()} />
-  } else if (requests.length === 0) {
+  } else if (query.data.items.length === 0 && !filtered) {
     body = (
       <EmptyState
         icon={ClipboardList}
@@ -66,19 +62,14 @@ export function SosListView() {
         action={<RaiseLink />}
       />
     )
-  } else if (result.total === 0) {
+  } else if (query.data.items.length === 0) {
     body = (
       <EmptyState
         icon={SearchX}
         title="No requests match"
         description="Try a different search, or clear the filters."
         action={
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 px-4"
-            onClick={() => params.clear('status', 'priority', 'need', 'q')}
-          >
+          <Button type="button" variant="outline" className="h-10 px-4" onClick={clearFilters}>
             Clear all filters
           </Button>
         }
@@ -88,14 +79,14 @@ export function SosListView() {
     body = (
       <>
         <ul aria-label="Your SOS requests" className="flex flex-col gap-4">
-          {result.items.map((sos) => (
+          {query.data.items.map((sos) => (
             <li key={sos.id}>
               <SosCard sos={sos} />
             </li>
           ))}
         </ul>
         <PaginationBar
-          meta={{ page: result.page, limit: SOS_PAGE_SIZE, total: result.total }}
+          meta={{ ...query.data.meta, limit: SOS_PAGE_SIZE }}
           onPageChange={params.setPage}
           disabled={query.isFetching}
         />
@@ -112,14 +103,13 @@ export function SosListView() {
       />
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-        {requests.length > 0 && <SosToolbar view={view} params={params} />}
+        {query.data && (total !== 0 || filtered) && <SosToolbar view={view} params={params} />}
 
-        {requests.length > 0 && (
+        {total !== undefined && (total !== 0 || filtered) && (
           <p aria-live="polite" className="text-sm text-muted-foreground">
             {filtered
-              ? `${result.total} of ${requests.length} requests match`
-              : `${requests.length} ${requests.length === 1 ? 'request' : 'requests'}`}
-            {truncated && ' (your 100 newest)'}
+              ? `${total} ${total === 1 ? 'request matches' : 'requests match'}`
+              : `${total} ${total === 1 ? 'request' : 'requests'}`}
           </p>
         )}
 

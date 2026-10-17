@@ -1,4 +1,4 @@
-import { ADMIN_PAGE_SIZE, DEFAULT_PAGE, MAX_PAGE_SIZE } from '@/lib/constants'
+import { ADMIN_PAGE_SIZE, DEFAULT_PAGE } from '@/lib/constants'
 import { DisasterType, type IncidentListParams, IncidentStatus, Priority } from '@/types'
 
 const STATUSES = Object.values(IncidentStatus)
@@ -38,7 +38,3 @@ export function toIncidentQuery(view: IncidentView): IncidentListParams {
     disasterType: view.disasterType,
   }
 }
-
-// There is no GET /incidents/:id, so an incident's own page reads the newest 100 and picks the one it
-// needs (an incident older than that is not found).
-export const INCIDENT_LOOKUP_PARAMS: IncidentListParams = { limit: MAX_PAGE_SIZE }

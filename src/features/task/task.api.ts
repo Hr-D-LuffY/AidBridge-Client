@@ -10,6 +10,8 @@ const list = (params: TaskListParams, signal?: AbortSignal) =>
 // One function per endpoint, for the browser (through the BFF). Server pages use task.server.ts.
 export const taskApi = {
   list,
+  // One of my own tasks, by the task's id (404 unknown, 403 someone else's).
+  get: (id: string, signal?: AbortSignal) => clientApi.get<Task>(`/tasks/${id}`, undefined, signal),
   // The tasks being worked: one request per status, merged. A volunteer holds three at most, so one
   // page of three per status always holds them all.
   active: async (signal?: AbortSignal): Promise<FullTask[]> => {

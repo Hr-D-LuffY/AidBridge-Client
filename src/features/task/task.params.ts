@@ -1,4 +1,4 @@
-import { DEFAULT_PAGE, MAX_PAGE_SIZE, TASK_HISTORY_PAGE_SIZE } from '@/lib/constants'
+import { DEFAULT_PAGE, TASK_HISTORY_PAGE_SIZE } from '@/lib/constants'
 import { type TaskListParams, TaskStatus } from '@/types'
 
 // A task being worked. A volunteer holds at most MAX_ACTIVE_TASKS of these at once.
@@ -41,7 +41,3 @@ export function parseTaskHistoryParams(raw: { page?: string; status?: string }):
 export function toHistoryQuery(view: TaskHistoryView): TaskListParams {
   return { status: view.status, page: view.page, limit: TASK_HISTORY_PAGE_SIZE }
 }
-
-// There is no GET /tasks/:id, so a task's own page reads the volunteer's newest 100 tasks and picks
-// the one it needs. Active tasks are always among the newest.
-export const TASK_LOOKUP_PARAMS: TaskListParams = { limit: MAX_PAGE_SIZE }

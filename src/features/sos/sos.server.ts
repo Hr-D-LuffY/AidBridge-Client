@@ -9,10 +9,11 @@ import type {
   SosStatus,
   SosView,
 } from '@/types'
+import { toSosApiQuery } from './sos.params'
 
 // The same endpoints for Server Components, which call the backend directly.
 export function getSosPage(params: SosListParams): Promise<Paginated<SosRequest>> {
-  return serverApi.getList<SosRequest>('/sos', params)
+  return serverApi.getList<SosRequest>('/sos', toSosApiQuery(params))
 }
 
 export function getSos(id: string): Promise<SosRequest> {
@@ -32,6 +33,6 @@ export function getNearbySosPage(params: NearbySosParams): Promise<Paginated<Nea
 
 // How many of my requests have this status (only the `meta.total` is read).
 export async function countSos(status: SosStatus): Promise<number> {
-  const { meta } = await serverApi.getList<SosRequest>('/sos', { status, limit: 1 })
+  const { meta } = await getSosPage({ status: [status], limit: 1 })
   return meta.total
 }

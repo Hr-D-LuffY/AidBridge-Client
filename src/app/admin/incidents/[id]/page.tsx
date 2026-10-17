@@ -3,25 +3,29 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { IncidentDetailView } from '@/features/incident/components/incident-detail-view'
 import { incidentKeys } from '@/features/incident/incident.keys'
-import { INCIDENT_LOOKUP_PARAMS } from '@/features/incident/incident.params'
-import { getIncidentPage } from '@/features/incident/incident.server'
+import { getIncident } from '@/features/incident/incident.server'
+import { isApiError } from '@/lib/api/errors'
 import { makeQueryClient } from '@/lib/query-client'
 
 export const metadata: Metadata = { title: 'Incident' }
 
 type PageProps = { params: Promise<{ id: string }> }
 
-// There is no GET /incidents/:id, so the page reads the newest 100 incidents and picks this one out. An id
-// that is not among them (unknown, deleted or older) shows the area's "not found" page.
+// One incident, read with GET /incidents/:id. A malformed, unknown or deleted id shows the area's "not
+// found" page.
 export default async function IncidentDetailPage({ params }: PageProps) {
   const { id } = await params
 
   const queryClient = makeQueryClient()
-  const page = await queryClient.fetchQuery({
-    queryKey: incidentKeys.list(INCIDENT_LOOKUP_PARAMS),
-    queryFn: () => getIncidentPage(INCIDENT_LOOKUP_PARAMS),
-  })
-  if (!page.items.some((incident) => incident.id === id)) notFound()
+  try {
+    await queryClient.fetchQuery({
+      queryKey: incidentKeys.detail(id),
+      queryFn: () => getIncident(id),
+    })
+  } catch (error) {
+    if (isApiError(error) && [400, 404].includes(error.status)) notFound()
+    throw error
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

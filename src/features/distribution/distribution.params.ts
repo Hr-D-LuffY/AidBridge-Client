@@ -1,8 +1,6 @@
 import { DEFAULT_PAGE, NGO_PAGE_SIZE } from '@/lib/constants'
+import { asDate, asObjectId } from '@/lib/params'
 import type { DistributionListParams } from '@/types'
-
-const OBJECT_ID = /^[0-9a-f]{24}$/
-const DATE = /^\d{4}-\d{2}-\d{2}$/
 
 export type DistributionView = {
   page: number
@@ -11,14 +9,6 @@ export type DistributionView = {
   // yyyy-mm-dd, as a date input gives them.
   from: string | undefined
   to: string | undefined
-}
-
-const asId = (value: string | undefined) => (value && OBJECT_ID.test(value) ? value : undefined)
-
-// A real calendar date, so ?from=2026-13-45 does not reach the backend as a 400.
-function asDate(value: string | undefined) {
-  if (!value || !DATE.test(value)) return undefined
-  return Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()) ? undefined : value
 }
 
 // The URL is the source of truth for the history, so each value is checked: a hand-edited value means
@@ -35,8 +25,8 @@ export function parseDistributionParams(raw: {
   const to = asDate(raw.to)
   return {
     page: Number.isInteger(page) && page >= DEFAULT_PAGE ? page : DEFAULT_PAGE,
-    camp: asId(raw.camp),
-    volunteer: asId(raw.volunteer),
+    camp: asObjectId(raw.camp),
+    volunteer: asObjectId(raw.volunteer),
     from,
     to: from && to && to < from ? undefined : to,
   }

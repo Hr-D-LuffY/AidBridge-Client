@@ -13,8 +13,8 @@ import {
 } from '@/types'
 import { taskApi } from './task.api'
 import { taskKeys } from './task.keys'
-import { isActiveTaskStatus, TASK_LOOKUP_PARAMS } from './task.params'
-import { findTask, SOS_STATUS_FOR_TASK } from './task.view'
+import { isActiveTaskStatus } from './task.params'
+import { SOS_STATUS_FOR_TASK } from './task.view'
 
 // A page of the volunteer's tasks (the history).
 export function useTasksQuery(params: TaskListParams) {
@@ -36,23 +36,23 @@ export function useActiveTasksQuery(pollMs: number | false = false) {
   })
 }
 
-// One task for its own page. The page prefetched the volunteer's newest 100 tasks (there is no
-// GET /tasks/:id), so this reads the same list and picks the task out, and a status change made
-// anywhere updates it. While the task is still active it is asked for again every `pollMs`.
+// One task for its own page (GET /tasks/:id, by the task's id). The server page has already loaded it, and
+// a status change made anywhere updates it. While the task is still active it is asked for again every
+// `pollMs`.
 export function useTaskQuery(id: string, pollMs: number | false = false) {
   return useQuery({
-    queryKey: taskKeys.list(TASK_LOOKUP_PARAMS),
-    queryFn: ({ signal }) => taskApi.list(TASK_LOOKUP_PARAMS, signal),
-    select: (page) => findTask(page.items, id),
+    queryKey: taskKeys.detail(id),
+    queryFn: ({ signal }) => taskApi.get(id, signal),
     refetchInterval: (query) => {
-      const task = findTask(query.state.data?.items ?? [], id)
+      const task = query.state.data
       return pollMs && task && isActiveTaskStatus(task.status) ? pollMs : false
     },
   })
 }
 
-// What the list caches hold: an array (the active tasks) or a page (any other list).
-type TaskCache = Task[] | Paginated<Task>
+// What the task caches hold: one task (its own page), an array (the active tasks) or a page (any other
+// list).
+type TaskCache = Task | Task[] | Paginated<Task>
 
 function patchTask(task: Task, taskId: string, status: TaskProgressStatus): Task {
   if (task.id !== taskId) return task
@@ -71,7 +71,10 @@ function patchCache(cache: TaskCache, taskId: string, status: TaskProgressStatus
       .map((task) => patchTask(task, taskId, status))
       .filter((task) => isActiveTaskStatus(task.status))
   }
-  return { ...cache, items: cache.items.map((task) => patchTask(task, taskId, status)) }
+  if ('items' in cache) {
+    return { ...cache, items: cache.items.map((task) => patchTask(task, taskId, status)) }
+  }
+  return patchTask(cache, taskId, status)
 }
 
 type CacheSnapshot = [readonly unknown[], TaskCache | undefined][]

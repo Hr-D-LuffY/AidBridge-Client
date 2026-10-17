@@ -18,6 +18,14 @@ export const SosStatus = {
 } as const
 export type SosStatus = (typeof SosStatus)[keyof typeof SosStatus]
 
+// How GET /sos orders a list. `priority` is critical first, newest first inside each level.
+export const SosSort = {
+  NEWEST: 'newest',
+  OLDEST: 'oldest',
+  PRIORITY: 'priority',
+} as const
+export type SosSort = (typeof SosSort)[keyof typeof SosSort]
+
 export const TaskStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',

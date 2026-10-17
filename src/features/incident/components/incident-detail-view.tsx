@@ -16,10 +16,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { EmptyState } from '@/components/shared/empty-state'
+import { ListErrorState } from '@/components/shared/list-error-state'
 import { PageHeader } from '@/components/shared/page-header'
+import { PaginationBar } from '@/components/shared/pagination-bar'
 import { StatCard } from '@/components/shared/stat-card'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useSosListQuery } from '@/features/sos/sos.queries'
 import { getErrorMessage } from '@/lib/api/errors'
 import { formatDate } from '@/lib/format'
@@ -29,14 +32,16 @@ import { type Incident, IncidentStatus, SosLinkAction } from '@/types'
 import {
   useDeleteIncident,
   useIncidentQuery,
-  useLinkedRequestIds,
   useLinkRequests,
   useSetIncidentPriority,
   useSetIncidentStatus,
 } from '../incident.queries'
 import { DISASTER_LABEL, PRIORITY_OPTIONS } from '../incident.view'
 import { IncidentFormSheet } from './incident-form-sheet'
-import { LINK_PICKER_PARAMS, LinkRequestsSheet } from './link-requests-sheet'
+import { LinkRequestsSheet } from './link-requests-sheet'
+
+// How many linked requests the panel shows at a time.
+const LINKED_PAGE_SIZE = 10
 
 function Panel({
   title,
@@ -58,61 +63,79 @@ function Panel({
   )
 }
 
-// The requests known to be linked, each with a way to open it and to take it off. Rendered only when there
-// are some, because it reads the request list to put names to the ids.
-function LinkedRequestList({ incidentId, ids }: { incidentId: string; ids: readonly string[] }) {
-  const requests = useSosListQuery(LINK_PICKER_PARAMS)
+// The requests linked to the incident (GET /sos?incidentId=), a page at a time, each with a way to open it
+// and to take it off. Rendered only when some are linked.
+function LinkedRequestList({ incidentId }: { incidentId: string }) {
+  const [page, setPage] = useState(1)
+  const requests = useSosListQuery({ incidentId, page, limit: LINKED_PAGE_SIZE })
   const unlink = useLinkRequests(incidentId)
-  const byId = new Map(requests.data?.items.map((sos) => [sos.id, sos]))
+
+  if (requests.isPending) {
+    return (
+      <div aria-busy="true" className="flex flex-col gap-2">
+        <output className="sr-only">Loading the linked requests</output>
+        {['one', 'two'].map((key) => (
+          <Skeleton key={key} className="h-14 rounded-xl" />
+        ))}
+      </div>
+    )
+  }
+  if (requests.isError) return <ListErrorState onRetry={() => requests.refetch()} />
 
   return (
-    <ul className="divide-y">
-      {ids.map((id) => {
-        const sos = byId.get(id)
-        const name = sos ? sos.address || `Request from ${sos.victim.name}` : 'Request'
-        return (
-          <li key={id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2">
-            <div className="flex min-w-0 flex-col items-start gap-1">
-              <Link
-                href={`/admin/sos/${id}`}
-                className="inline-flex min-h-8 items-center gap-1.5 rounded-md font-medium text-link outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-11"
-              >
-                {name}
-                <ExternalLink aria-hidden="true" className="size-3.5" />
-              </Link>
-              {sos && <StatusBadge kind="sos" status={sos.status} />}
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-10 gap-1.5 px-3 text-muted-foreground"
-              disabled={unlink.isPending}
-              onClick={() =>
-                unlink.mutate(
-                  { action: SosLinkAction.UNLINK, ids: [id] },
-                  { onError: (error) => toast.error(getErrorMessage(error)) },
-                )
-              }
+    <>
+      <ul className="divide-y">
+        {requests.data.items.map((sos) => {
+          const name = sos.address || `Request from ${sos.victim.name}`
+          return (
+            <li
+              key={sos.id}
+              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2"
             >
-              <Unlink aria-hidden="true" />
-              Unlink
-              <span className="sr-only"> {name}</span>
-            </Button>
-          </li>
-        )
-      })}
-    </ul>
+              <div className="flex min-w-0 flex-col items-start gap-1">
+                <Link
+                  href={`/admin/sos/${sos.id}`}
+                  className="inline-flex min-h-8 items-center gap-1.5 rounded-md font-medium text-link outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-11"
+                >
+                  {name}
+                  <ExternalLink aria-hidden="true" className="size-3.5" />
+                </Link>
+                <StatusBadge kind="sos" status={sos.status} />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-10 gap-1.5 px-3 text-muted-foreground"
+                disabled={unlink.isPending}
+                onClick={() =>
+                  unlink.mutate(
+                    { action: SosLinkAction.UNLINK, ids: [sos.id] },
+                    { onError: (error) => toast.error(getErrorMessage(error)) },
+                  )
+                }
+              >
+                <Unlink aria-hidden="true" />
+                Unlink
+                <span className="sr-only"> {name}</span>
+              </Button>
+            </li>
+          )
+        })}
+      </ul>
+      <PaginationBar
+        meta={{ ...requests.data.meta, limit: LINKED_PAGE_SIZE }}
+        onPageChange={setPage}
+        disabled={requests.isFetching}
+      />
+    </>
   )
 }
 
-// One incident: its dates and place, how many linked requests were rescued, its priority, and the actions
-// (edit, resolve or reopen, delete, link requests). There is no endpoint that reads one incident or lists
-// the ids linked to it, so the page reads the newest 100 incidents, and shows linked requests only after a
-// link or unlink in this browser has reported them; the counts above are always right.
+// One incident: its dates and place, the requests linked to it and how many were rescued, its priority, and
+// the actions (edit, resolve or reopen, delete, link requests).
 export function IncidentDetailView({ id }: { id: string }) {
   const router = useRouter()
   const { data: incident } = useIncidentQuery(id)
-  const linkedIds = useLinkedRequestIds(id).data
   const setStatus = useSetIncidentStatus(id)
   const setPriority = useSetIncidentPriority(id)
   const remove = useDeleteIncident(id)
@@ -129,7 +152,7 @@ export function IncidentDetailView({ id }: { id: string }) {
         <EmptyState
           icon={Flag}
           title="Incident not found"
-          description="It may have been deleted, or it is older than the newest 100 incidents this page reads."
+          description="It may have been deleted."
           action={
             <Link
               href="/admin/incidents"
@@ -144,7 +167,7 @@ export function IncidentDetailView({ id }: { id: string }) {
   }
 
   const active = incident.status === IncidentStatus.ACTIVE
-  const known = linkedIds ?? []
+  const linkedIds = incident.sosRequests ?? []
 
   return (
     <div className="flex flex-col gap-6">
@@ -229,13 +252,11 @@ export function IncidentDetailView({ id }: { id: string }) {
               </Button>
             }
           >
-            {known.length > 0 ? (
-              <LinkedRequestList incidentId={incident.id} ids={known} />
+            {linkedIds.length > 0 ? (
+              <LinkedRequestList incidentId={incident.id} />
             ) : (
               <p className="text-sm text-muted-foreground">
-                {incident.linkedRequests > 0
-                  ? `${incident.linkedRequests} ${incident.linkedRequests === 1 ? 'request is' : 'requests are'} linked. The list appears here after you link or unlink something, because the server does not send it any other time.`
-                  : 'No requests are linked yet. Link the ones this disaster caused.'}
+                No requests are linked yet. Link the ones this disaster caused.
               </p>
             )}
           </Panel>
@@ -294,7 +315,7 @@ export function IncidentDetailView({ id }: { id: string }) {
       {linking && (
         <LinkRequestsSheet
           incidentId={incident.id}
-          linkedIds={known}
+          linkedIds={linkedIds}
           open
           onOpenChange={setLinking}
         />

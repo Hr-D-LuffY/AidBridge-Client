@@ -7,6 +7,7 @@ import type {
   CreateNotificationPayload,
   NotificationListParams,
   Paginated,
+  PaginationParams,
 } from '@/types'
 import { notificationApi } from './notification.api'
 import { notificationKeys } from './notification.keys'
@@ -18,6 +19,16 @@ export function useNotificationsQuery(params: NotificationListParams, pollMs: nu
     queryFn: ({ signal }) => notificationApi.list(params, signal),
     refetchInterval: pollMs,
     // Keep showing the old page while the next one loads.
+    placeholderData: keepPreviousData,
+  })
+}
+
+// A page of the admin's broadcast history. The page is in the URL, so a change keeps the old rows on
+// screen until the new ones arrive.
+export function useBroadcastsQuery(params: PaginationParams) {
+  return useQuery({
+    queryKey: notificationKeys.broadcasts(params),
+    queryFn: ({ signal }) => notificationApi.broadcasts(params, signal),
     placeholderData: keepPreviousData,
   })
 }
@@ -76,7 +87,8 @@ export function useMarkNotificationRead() {
 }
 
 // Admin: sends a broadcast. The composer shows its own errors, so the global toast is off. The history and
-// the bell are read again, since the admin may be among the recipients.
+// the bell are read again, since the new broadcast joins the history and the admin may be among the
+// recipients.
 export function useSendBroadcast() {
   const queryClient = useQueryClient()
   return useMutation({

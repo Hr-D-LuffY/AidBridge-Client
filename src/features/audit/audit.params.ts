@@ -1,8 +1,7 @@
 import { ADMIN_PAGE_SIZE, DEFAULT_PAGE } from '@/lib/constants'
+import { asDate, asObjectId } from '@/lib/params'
 import { AuditAction, type AuditListParams, AuditTargetType } from '@/types'
 
-const OBJECT_ID = /^[0-9a-f]{24}$/
-const DATE = /^\d{4}-\d{2}-\d{2}$/
 const ACTIONS = Object.values(AuditAction)
 const TARGET_TYPES = Object.values(AuditTargetType)
 
@@ -14,12 +13,6 @@ export type AuditView = {
   // yyyy-mm-dd, as a date input gives them.
   from: string | undefined
   to: string | undefined
-}
-
-// A real calendar date, so ?from=2026-13-45 does not reach the backend as a 400.
-function asDate(value: string | undefined) {
-  if (!value || !DATE.test(value)) return undefined
-  return Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()) ? undefined : value
 }
 
 // The URL is the source of truth, so each value is checked: a hand-edited value means "no filter". An end
@@ -37,7 +30,7 @@ export function parseAuditParams(raw: {
   const to = asDate(raw.to)
   return {
     page: Number.isInteger(page) && page >= DEFAULT_PAGE ? page : DEFAULT_PAGE,
-    actor: raw.actor && OBJECT_ID.test(raw.actor) ? raw.actor : undefined,
+    actor: asObjectId(raw.actor),
     action: ACTIONS.find((action) => action === raw.action),
     type: TARGET_TYPES.find((type) => type === raw.type),
     from,

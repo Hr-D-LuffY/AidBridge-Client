@@ -4,6 +4,7 @@ import type {
   Priority,
   ReliefCategory,
   ResolvedBy,
+  SosSort,
   SosStatus,
   TaskStatus,
 } from './enums'
@@ -52,9 +53,21 @@ export type SosRequest = {
   updatedAt: string
 }
 
+// GET /sos. A list filter matches any of its values; different filters combine. `q` is 2-100 characters and
+// matches whole words of the description and address. `from` and `to` are dates (yyyy-mm-dd) of when the
+// request was raised; a bare `to` covers that whole day. `incidentId`, `volunteerId` and `victimId` are for
+// admin and NGO only (anyone else gets a 403).
 export type SosListParams = PaginationParams & {
-  status?: SosStatus
-  priority?: Priority
+  status?: SosStatus[]
+  priority?: Priority[]
+  needs?: ReliefCategory[]
+  q?: string
+  from?: string
+  to?: string
+  sort?: SosSort
+  incidentId?: string
+  volunteerId?: string
+  victimId?: string
 }
 
 export type CreateSosPayload = {

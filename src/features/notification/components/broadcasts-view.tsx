@@ -30,7 +30,7 @@ import {
   describeTargets,
   toBroadcastHistoryQuery,
 } from '../notification.broadcast'
-import { useNotificationsQuery, useSendBroadcast } from '../notification.queries'
+import { useBroadcastsQuery, useSendBroadcast } from '../notification.queries'
 
 const FIELD_NAMES = ['title', 'message', 'targetRoles', 'isEmergencyBroadcast'] as const
 
@@ -205,7 +205,7 @@ function Composer() {
 
 function History() {
   const params = useQueryParams()
-  const query = useNotificationsQuery(toBroadcastHistoryQuery(params.get('page')), false)
+  const query = useBroadcastsQuery(toBroadcastHistoryQuery(params.get('page')))
 
   if (query.isPending) {
     return (
@@ -222,8 +222,8 @@ function History() {
     return (
       <EmptyState
         icon={Megaphone}
-        title="Nothing sent to everyone yet"
-        description="Broadcasts addressed to everyone or to admins show up here."
+        title="Nothing sent yet"
+        description="Every broadcast you or another admin sends shows up here, with how many people opened it."
       />
     )
   }
@@ -246,6 +246,12 @@ function History() {
             </div>
             <p className="font-semibold">{item.title}</p>
             <p className="text-pretty whitespace-pre-line">{item.message}</p>
+            <p className="text-sm text-muted-foreground">
+              Sent to {describeTargets(item.targetRoles)}
+              {item.sentBy && ` by ${item.sentBy.name}`}.{' '}
+              <span className="tabular-nums">{item.readCount}</span>{' '}
+              {item.readCount === 1 ? 'person has' : 'people have'} opened it.
+            </p>
           </li>
         ))}
       </ul>
@@ -259,8 +265,7 @@ function History() {
 }
 
 // Writes to people on the platform: a notification in their bell, and for an emergency also an email. The
-// backend keeps no list of what an admin sent to other roles, so the history below shows what is addressed
-// to everyone or to admins, which is what the server lets an admin read.
+// history below is everything admins sent, with how many people opened each (never who).
 export function BroadcastsView() {
   return (
     <div className="flex flex-col gap-8">
@@ -281,8 +286,7 @@ export function BroadcastsView() {
           Recent broadcasts
         </h2>
         <p className="text-sm text-muted-foreground">
-          What was addressed to everyone or to admins. A message sent only to other roles is not
-          listed: the server does not keep a separate history of what an admin sent.
+          Newest first. Personal alerts the system raises, such as chat messages, are not listed.
         </p>
         <History />
       </section>

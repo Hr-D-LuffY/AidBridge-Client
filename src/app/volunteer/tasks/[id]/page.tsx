@@ -1,32 +1,40 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { TaskDetailView } from '@/features/task/components/task-detail-view'
 import { taskKeys } from '@/features/task/task.keys'
-import { TASK_LOOKUP_PARAMS } from '@/features/task/task.params'
-import { getTaskPage } from '@/features/task/task.server'
-import { findTask, hasFullSos } from '@/features/task/task.view'
+import { getTask, getTaskPage } from '@/features/task/task.server'
+import { findTaskByRequest, hasFullSos } from '@/features/task/task.view'
+import { isApiError } from '@/lib/api/errors'
+import { MAX_PAGE_SIZE } from '@/lib/constants'
 import { makeQueryClient } from '@/lib/query-client'
+import type { Task } from '@/types'
 
 export const metadata: Metadata = { title: 'Task' }
 
 type PageProps = { params: Promise<{ id: string }> }
 
-// There is no GET /tasks/:id, so the page reads the volunteer's newest 100 tasks and picks this one
-// out. The id is the task's, or the request's (a chat notification links to the request). A task
-// that is not in them, is someone else's, or is not in the full view (declined or cancelled before it
-// was accepted) shows the area's "not found" page.
+// The id is the task's (GET /tasks/:id). A chat notification only knows the request, so an id that is no
+// task of this volunteer is looked up as a request id among their newest tasks, and the page moves to the
+// task's own address. Anything else, a task that belongs to someone else, or one that is not in the full
+// view (declined or cancelled before it was accepted) shows the area's "not found" page.
 export default async function TaskPage({ params }: PageProps) {
   const { id } = await params
 
-  const queryClient = makeQueryClient()
-  const page = await queryClient.fetchQuery({
-    queryKey: taskKeys.list(TASK_LOOKUP_PARAMS),
-    queryFn: () => getTaskPage(TASK_LOOKUP_PARAMS),
-  })
+  let task: Task
+  try {
+    task = await getTask(id)
+  } catch (error) {
+    if (!isApiError(error) || ![400, 403, 404].includes(error.status)) throw error
+    const page = await getTaskPage({ limit: MAX_PAGE_SIZE })
+    const byRequest = findTaskByRequest(page.items, id)
+    if (!byRequest) notFound()
+    redirect(`/volunteer/tasks/${byRequest.id}`)
+  }
+  if (!hasFullSos(task)) notFound()
 
-  const task = findTask(page.items, id)
-  if (!task || !hasFullSos(task)) notFound()
+  const queryClient = makeQueryClient()
+  queryClient.setQueryData(taskKeys.detail(id), task)
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

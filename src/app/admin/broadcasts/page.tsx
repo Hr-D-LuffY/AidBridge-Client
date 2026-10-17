@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { BroadcastsView } from '@/features/notification/components/broadcasts-view'
 import { toBroadcastHistoryQuery } from '@/features/notification/notification.broadcast'
 import { notificationKeys } from '@/features/notification/notification.keys'
-import { getNotificationPage } from '@/features/notification/notification.server'
+import { getBroadcastPage } from '@/features/notification/notification.server'
 import { makeQueryClient } from '@/lib/query-client'
 
 export const metadata: Metadata = { title: 'Broadcasts' }
@@ -19,8 +19,8 @@ export default async function BroadcastsPage({ searchParams }: PageProps) {
   // A failure is not fatal: prefetchQuery swallows it and the client view fetches (and shows its own
   // error state) instead.
   await queryClient.prefetchQuery({
-    queryKey: notificationKeys.list(query),
-    queryFn: () => getNotificationPage(query),
+    queryKey: notificationKeys.broadcasts(query),
+    queryFn: () => getBroadcastPage(query),
   })
 
   return (

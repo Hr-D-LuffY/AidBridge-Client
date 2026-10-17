@@ -11,11 +11,12 @@ import type {
   SosRequest,
   UpdateSosPayload,
 } from '@/types'
+import { toSosApiQuery } from './sos.params'
 
 // One function per endpoint, for the browser (through the BFF). Server pages use sos.server.ts.
 export const sosApi = {
   list: (params: SosListParams, signal?: AbortSignal) =>
-    clientApi.getList<SosRequest>('/sos', params, signal),
+    clientApi.getList<SosRequest>('/sos', toSosApiQuery(params), signal),
   get: (id: string, signal?: AbortSignal) =>
     clientApi.get<SosRequest>(`/sos/${id}`, undefined, signal),
   create: (payload: CreateSosPayload) => clientApi.post<SosRequest>('/sos', payload),

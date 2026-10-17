@@ -25,3 +25,16 @@ export type CreateNotificationPayload = {
   targetRoles: NotificationTarget[]
   isEmergencyBroadcast: boolean
 }
+
+// One line of the admin's broadcast history (GET /notifications/broadcasts): what an admin sent to roles.
+// `readCount` is how many people opened it, never who. `sentBy` is null when that account is gone.
+export type Broadcast = {
+  id: string
+  title: string
+  message: string
+  targetRoles: NotificationTarget[]
+  isEmergencyBroadcast: boolean
+  sentBy: { id: string; name: string } | null
+  readCount: number
+  createdAt: string
+}

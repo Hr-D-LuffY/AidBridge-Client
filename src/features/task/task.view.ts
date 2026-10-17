@@ -29,7 +29,8 @@ export const SOS_STATUS_FOR_TASK = {
 } as const
 
 // A task's own page is opened with its task id (from the task board) or with its request's id (from a
-// notification, which only knows the request). A volunteer has one task per request, so either finds it.
-export function findTask(tasks: readonly Task[], id: string): Task | undefined {
-  return tasks.find((task) => task.id === id || task.sosRequest.id === id)
+// chat notification, which only knows the request). A volunteer has one task per request, so this finds
+// the task of a request among a list of tasks.
+export function findTaskByRequest(tasks: readonly Task[], sosId: string): Task | undefined {
+  return tasks.find((task) => task.sosRequest.id === sosId)
 }

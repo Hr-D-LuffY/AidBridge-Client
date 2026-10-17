@@ -6,12 +6,7 @@ import {
   DEFAULT_PAGE,
   ROLE_LABEL,
 } from '@/lib/constants'
-import {
-  ALL_ROLES_TARGET,
-  type NotificationListParams,
-  type NotificationTarget,
-  Role,
-} from '@/types'
+import { ALL_ROLES_TARGET, type NotificationTarget, type PaginationParams, Role } from '@/types'
 
 // The admin's broadcast composer. Mirrors the backend's createNotificationSchema
 // (notification.interface.ts): `all` stands alone, and an emergency broadcast also sends an email.
@@ -58,8 +53,8 @@ export function describeTargets(targets: readonly string[]): string {
   return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`
 }
 
-// The history lists what is addressed to the admin (everyone, or admins), a page at a time.
-export function toBroadcastHistoryQuery(rawPage: string | undefined): NotificationListParams {
+// The history lists what admins sent to roles, a page at a time.
+export function toBroadcastHistoryQuery(rawPage: string | undefined): PaginationParams {
   const page = Number(rawPage)
   return {
     page: Number.isInteger(page) && page >= DEFAULT_PAGE ? page : DEFAULT_PAGE,

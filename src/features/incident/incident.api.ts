@@ -12,6 +12,9 @@ export const incidentApi = {
   // Newest first. Readable by every signed-in user; only an admin can change anything.
   list: (params: IncidentListParams, signal?: AbortSignal) =>
     clientApi.getList<Incident>('/incidents', params, signal),
+  // One incident. For admin and NGO it carries `sosRequests`, the ids of the linked requests.
+  get: (id: string, signal?: AbortSignal) =>
+    clientApi.get<Incident>(`/incidents/${id}`, undefined, signal),
   create: (payload: CreateIncidentPayload) => clientApi.post<Incident>('/incidents', payload),
   // Only what changed. `status: 'resolved'` stamps the end date; `active` clears it.
   update: (id: string, payload: UpdateIncidentPayload) =>

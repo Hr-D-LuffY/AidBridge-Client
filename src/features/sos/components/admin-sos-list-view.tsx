@@ -4,7 +4,6 @@ import { ArrowRight, Phone, SearchX, Siren } from 'lucide-react'
 import Link from 'next/link'
 import { DataTable, type DataTableColumn } from '@/components/shared/data-table'
 import { EmptyState } from '@/components/shared/empty-state'
-import { FilterChips } from '@/components/shared/filter-chips'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
@@ -12,25 +11,10 @@ import { Button } from '@/components/ui/button'
 import { useQueryParams } from '@/hooks/use-query-params'
 import { ADMIN_PAGE_SIZE } from '@/lib/constants'
 import { formatRelativeTime } from '@/lib/format'
-import { Priority, type SosRequest, SosStatus } from '@/types'
-import { parseAdminSosParams, toAdminSosQuery } from '../sos.admin'
+import type { SosRequest } from '@/types'
+import { countActiveFilters, parseSosParams, toSosQuery } from '../sos.params'
 import { useSosListQuery } from '../sos.queries'
-import { STATUS_SWATCH } from '../sos.surface'
-
-const STATUS_OPTIONS = [
-  { value: SosStatus.PENDING, label: 'Waiting', swatch: STATUS_SWATCH[SosStatus.PENDING] },
-  { value: SosStatus.ASSIGNED, label: 'Assigned', swatch: STATUS_SWATCH[SosStatus.ASSIGNED] },
-  { value: SosStatus.ON_THE_WAY, label: 'On the way', swatch: STATUS_SWATCH[SosStatus.ON_THE_WAY] },
-  { value: SosStatus.RESCUED, label: 'Rescued', swatch: STATUS_SWATCH[SosStatus.RESCUED] },
-  { value: SosStatus.CLOSED, label: 'Closed', swatch: STATUS_SWATCH[SosStatus.CLOSED] },
-] as const
-
-const PRIORITY_OPTIONS = [
-  { value: Priority.CRITICAL, label: 'Critical' },
-  { value: Priority.HIGH, label: 'High' },
-  { value: Priority.MEDIUM, label: 'Medium' },
-  { value: Priority.LOW, label: 'Low' },
-] as const
+import { SosToolbar } from './sos-toolbar'
 
 const COLUMNS: DataTableColumn<SosRequest>[] = [
   {
@@ -88,20 +72,25 @@ const COLUMNS: DataTableColumn<SosRequest>[] = [
   },
 ]
 
-// Every SOS request on the platform, newest first, paged by the server. Status and priority filter it,
-// and both (with the page) live in the URL. An admin opens a request to read it, follow its chat and
+// Every SOS request on the platform, paged by the server. Search, sort, status, priority, needs and the
+// dates it was raised filter it, and all of them (with the page) live in the URL. An admin opens a request to read it, follow its chat and
 // change its priority.
 export function AdminSosListView() {
   const params = useQueryParams()
-  const view = parseAdminSosParams({
+  const view = parseSosParams({
     page: params.get('page'),
     status: params.get('status'),
     priority: params.get('priority'),
+    needs: params.get('needs'),
+    q: params.get('q'),
+    from: params.get('from'),
+    to: params.get('to'),
+    sort: params.get('sort'),
   })
-  const query = useSosListQuery(toAdminSosQuery(view))
+  const query = useSosListQuery(toSosQuery(view, ADMIN_PAGE_SIZE))
 
-  const filtered = Boolean(view.status || view.priority)
-  const clearFilters = () => params.clear('status', 'priority')
+  const filtered = countActiveFilters(view) > 0
+  const clearFilters = () => params.clear('status', 'priority', 'needs', 'q', 'from', 'to')
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,20 +99,7 @@ export function AdminSosListView() {
         description="Every request for help on the platform. Open one to read it, follow the conversation and change how urgent it is."
       />
 
-      <div className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
-        <FilterChips
-          label="Status"
-          options={STATUS_OPTIONS}
-          value={view.status}
-          onChange={(status) => params.set({ status })}
-        />
-        <FilterChips
-          label="Priority"
-          options={PRIORITY_OPTIONS}
-          value={view.priority}
-          onChange={(priority) => params.set({ priority })}
-        />
-      </div>
+      <SosToolbar view={view} params={params} />
 
       <DataTable
         label="SOS requests"

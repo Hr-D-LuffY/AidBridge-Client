@@ -1,13 +1,8 @@
 'use client'
 
-import {
-  keepPreviousData,
-  skipToken,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { sosKeys } from '@/features/sos/sos.keys'
 import {
   type CreateIncidentPayload,
   type IncidentListParams,
@@ -18,7 +13,6 @@ import {
 } from '@/types'
 import { incidentApi } from './incident.api'
 import { incidentKeys } from './incident.keys'
-import { INCIDENT_LOOKUP_PARAMS } from './incident.params'
 
 // A page of incidents. The filters and page live in the URL, so a change keeps the old rows on screen
 // until the new ones arrive.
@@ -30,30 +24,20 @@ export function useIncidentsQuery(params: IncidentListParams) {
   })
 }
 
-// One incident for its own page. There is no GET /incidents/:id, so the page prefetched the newest 100
-// and this picks the incident out; any change made anywhere updates it.
+// One incident for its own page (GET /incidents/:id). The server page has already loaded it, and any
+// change made anywhere reads it again.
 export function useIncidentQuery(id: string) {
   return useQuery({
-    queryKey: incidentKeys.list(INCIDENT_LOOKUP_PARAMS),
-    queryFn: ({ signal }) => incidentApi.list(INCIDENT_LOOKUP_PARAMS, signal),
-    select: (page) => page.items.find((incident) => incident.id === id),
+    queryKey: incidentKeys.detail(id),
+    queryFn: ({ signal }) => incidentApi.get(id, signal),
   })
 }
 
-// The ids of the requests linked to an incident, as the last link or unlink answer reported them
-// (undefined until one has happened in this browser: the backend does not list them otherwise).
-export function useLinkedRequestIds(id: string) {
-  return useQuery<string[]>({
-    queryKey: incidentKeys.links(id),
-    queryFn: skipToken,
-    staleTime: Number.POSITIVE_INFINITY,
-    gcTime: Number.POSITIVE_INFINITY,
-  })
-}
-
+// After a change, the incident's page and every list read it again (the lists show its status, priority
+// and counts).
 function useRefreshIncidents() {
   const queryClient = useQueryClient()
-  return () => queryClient.invalidateQueries({ queryKey: incidentKeys.lists() })
+  return () => queryClient.invalidateQueries({ queryKey: incidentKeys.all })
 }
 
 // The sheet shows its own errors (a field the backend refused), so the global toast is off.
@@ -99,17 +83,21 @@ export function useSetIncidentPriority(id: string) {
   })
 }
 
+// The incident's own page is dropped from the cache rather than read again, because it would answer 404.
 export function useDeleteIncident(id: string) {
-  const refresh = useRefreshIncidents()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => incidentApi.remove(id),
-    onSuccess: () => toast.success('Incident deleted.'),
-    onSettled: refresh,
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: incidentKeys.detail(id) })
+      toast.success('Incident deleted.')
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: incidentKeys.lists() }),
   })
 }
 
-// Links or unlinks requests. The answer lists the ids linked now, which is the only time the backend
-// does, so it is kept for the incident's page. The sheet shows its own errors (an unknown id is a 400).
+// Links or unlinks requests. The incident (with its counts and linked ids) and the lists of linked requests
+// are read again. The sheet shows its own errors (an unknown id is a 400).
 export function useLinkRequests(id: string) {
   const queryClient = useQueryClient()
   const refresh = useRefreshIncidents()
@@ -117,9 +105,8 @@ export function useLinkRequests(id: string) {
     mutationFn: ({ action, ids }: { action: SosLinkAction; ids: string[] }) =>
       incidentApi.linkRequests(id, action, ids),
     meta: { skipGlobalError: true },
-    onSuccess: (incident, { action, ids }) => {
-      if (incident.sosRequests)
-        queryClient.setQueryData(incidentKeys.links(id), incident.sosRequests)
+    onSuccess: (_incident, { action, ids }) => {
+      queryClient.invalidateQueries({ queryKey: sosKeys.lists() })
       const count = ids.length
       toast.success(
         action === SosLinkAction.LINK

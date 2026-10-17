@@ -10,6 +10,11 @@ export function getTaskPage(params: TaskListParams): Promise<Paginated<Task>> {
   return serverApi.getList<Task>('/tasks', params)
 }
 
+// One of my own tasks (GET /tasks/:id).
+export function getTask(id: string): Promise<Task> {
+  return serverApi.get<Task>(`/tasks/${id}`)
+}
+
 // The tasks being worked: one request per status, merged (see taskApi.active).
 export async function getActiveTasks(): Promise<FullTask[]> {
   const pages = await Promise.all(
