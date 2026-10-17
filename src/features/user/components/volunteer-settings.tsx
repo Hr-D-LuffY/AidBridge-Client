@@ -2,12 +2,12 @@
 
 import { MapPin, Save, Star, TriangleAlert } from 'lucide-react'
 import { LocationMap } from '@/components/shared/location-map'
+import { Switch } from '@/components/shared/switch'
 import { Button } from '@/components/ui/button'
 import { useLocationField } from '@/hooks/use-location-field'
 import { getErrorMessage } from '@/lib/api/errors'
 import { RATING_MAX } from '@/lib/constants'
 import { fromGeoPoint, toLngLat } from '@/lib/geo'
-import { cn } from '@/lib/utils'
 import type { UserProfile } from '@/types'
 import { useUpdateProfile } from '../user.queries'
 import { ProfileSection } from './profile-section'
@@ -40,27 +40,13 @@ function AvailabilitySwitch({ profile }: { profile: UserProfile }) {
             Turn this off when you cannot take on work, so NGOs and administrators know.
           </span>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={available}
-          aria-labelledby="availability-label"
-          aria-describedby="availability-hint"
-          disabled={update.isPending}
-          onClick={() => update.mutate({ isAvailable: !available })}
-          className={cn(
-            'relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-70 pointer-coarse:h-11',
-            available ? 'border-primary bg-primary' : 'border-input bg-muted',
-          )}
-        >
-          <span
-            aria-hidden="true"
-            className={cn(
-              'absolute size-5 rounded-full bg-background shadow-sm transition-transform',
-              available ? 'translate-x-7' : 'translate-x-1',
-            )}
-          />
-        </button>
+        <Switch
+          checked={available}
+          onChange={(isAvailable) => update.mutate({ isAvailable })}
+          labelledBy="availability-label"
+          describedBy="availability-hint"
+          pending={update.isPending}
+        />
       </div>
       {update.isError && <ErrorLine error={update.error} />}
     </div>

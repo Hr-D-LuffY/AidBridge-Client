@@ -15,7 +15,12 @@ import { NOTIFICATION_PAGE_SIZE } from '@/lib/constants'
 import { formatDateTime, formatRelativeTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { AppNotification } from '@/types'
-import { useMarkNotificationRead, useNotificationsQuery } from '../notification.queries'
+import {
+  useMarkAllRead,
+  useMarkNotificationRead,
+  useNotificationsQuery,
+  useUnreadCountQuery,
+} from '../notification.queries'
 import {
   CATEGORY_LABEL,
   getNotificationLink,
@@ -135,6 +140,9 @@ export function NotificationsView() {
     poll,
   )
   const markRead = useMarkNotificationRead()
+  const markAllRead = useMarkAllRead()
+  // The same cached number the bell shows. Nothing to do when it is 0.
+  const unread = useUnreadCountQuery(false).data ?? 0
 
   let body: React.ReactNode
   if (query.isPending) {
@@ -201,6 +209,18 @@ export function NotificationsView() {
       <PageHeader
         title="Notifications"
         description="Alerts from administrators and updates about your requests."
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 gap-2 px-4"
+            disabled={unread === 0 || markAllRead.isPending}
+            onClick={() => markAllRead.mutate()}
+          >
+            <CheckCheck aria-hidden="true" />
+            Mark all as read
+          </Button>
+        }
       />
       <FilterChips
         label="Show"

@@ -43,3 +43,22 @@ export type Broadcast = {
   readCount: number
   createdAt: string
 }
+
+// One category's switches (GET /notifications/preferences). `inAppLocked` means every notification in the
+// category is mandatory, so the in-app switch is always on and cannot be turned off. Email is never locked.
+export type CategoryPreference = {
+  inApp: boolean
+  email: boolean
+  inAppLocked: boolean
+}
+
+export type NotificationPreferences = Record<NotificationCategory, CategoryPreference>
+
+// PUT /notifications/preferences: any subset of the categories, each with `inApp` and/or `email`. A
+// locked category's `inApp: false` is a 400.
+export type UpdatePreferencesPayload = Partial<
+  Record<NotificationCategory, { inApp?: boolean; email?: boolean }>
+>
+
+// PUT /notifications/read-all: everything unread, or only one category.
+export type MarkAllReadParams = { category?: NotificationCategory }

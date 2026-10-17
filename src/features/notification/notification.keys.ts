@@ -8,5 +8,6 @@ export const notificationKeys = {
   // Admin: what was sent to roles.
   broadcasts: (params: PaginationParams) =>
     [...notificationKeys.all, 'broadcasts', params] as const,
+  preferences: () => [...notificationKeys.all, 'preferences'] as const,
   unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
 }

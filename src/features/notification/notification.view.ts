@@ -74,6 +74,24 @@ export const CATEGORY_LABEL: Record<NotificationCategory, string> = {
   [NotificationCategory.SYSTEM]: 'Announcements and account',
 }
 
+// What each group holds, in a line, for the preferences card.
+export const CATEGORY_HELP: Record<NotificationCategory, string> = {
+  [NotificationCategory.REQUESTS]:
+    'A volunteer accepted, is on the way or has rescued you, and new chat messages.',
+  [NotificationCategory.TASKS]:
+    'Changes to the tasks you are doing, such as the request being edited.',
+  [NotificationCategory.CAMPS]: 'Alerts about your camps, such as an item running low.',
+  [NotificationCategory.SAFETY]: 'Safety news, such as a volunteer backing out of your request.',
+  [NotificationCategory.SYSTEM]:
+    'Announcements from administrators and the decision on a volunteer request.',
+}
+
+// A rule worth saying next to a switch. Tasks can be switched off, but a cancelled task always arrives.
+export const CATEGORY_NOTE: Partial<Record<NotificationCategory, string>> = {
+  [NotificationCategory.TASKS]:
+    'Switching this off stops the optional updates. If a task is cancelled you are always told.',
+}
+
 export function getNotificationCategory(category: string): NotificationCategory {
   return CATEGORY_ORDER.find((known) => known === category) ?? NotificationCategory.SYSTEM
 }

@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { ProfileDetailsCard, type ProfileFact } from '@/components/shared/profile-details-card'
 import { ProfileIdentityCard } from '@/components/shared/profile-identity-card'
 import { StatusBadge } from '@/components/shared/status-badge'
+import { NotificationPreferences } from '@/features/notification/components/notification-preferences'
 import { useSession } from '@/hooks/use-session'
 import { formatDate } from '@/lib/format'
 import { Role } from '@/types'
@@ -55,6 +56,13 @@ export function ProfileView() {
           />
 
           {profile.role === Role.VOLUNTEER && <VolunteerSettings profile={profile} />}
+
+          <ProfileSection
+            title="Notifications"
+            description="Choose what reaches you in the app and by email."
+          >
+            <NotificationPreferences />
+          </ProfileSection>
 
           <ProfileDetailsCard
             title="Password"
