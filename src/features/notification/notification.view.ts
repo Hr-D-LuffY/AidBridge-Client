@@ -4,6 +4,7 @@ import {
   BellRing,
   CheckCheck,
   CircleX,
+  ClipboardCheck,
   type LucideIcon,
   Megaphone,
   MessageSquare,
@@ -53,6 +54,7 @@ const TYPE_STYLES: Record<NotificationType, TypeStyle> = {
   [NotificationType.TASK_OFFERED]: { icon: BellRing, tone: 'high' },
   [NotificationType.OFFER_EXPIRED]: { icon: TimerOff, tone: 'neutral' },
   [NotificationType.SOS_UNSERVED]: { icon: TriangleAlert, tone: 'danger' },
+  [NotificationType.TASK_ASSIGNED]: { icon: ClipboardCheck, tone: 'info' },
 }
 
 function isOneOf<T extends string>(map: Record<T, unknown>, key: string): key is T {

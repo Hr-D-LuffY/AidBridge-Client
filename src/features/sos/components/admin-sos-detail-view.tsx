@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
 import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
+import { DispatchPanel } from '@/features/dispatch/components/dispatch-panel'
 import { ChatPanel } from '@/features/message/components/chat-panel'
 import { usePolling } from '@/hooks/use-polling'
 import { POLL_INTERVAL_MS } from '@/lib/constants'
@@ -134,6 +135,8 @@ export function AdminSosDetailView({ id }: { id: string }) {
         </div>
 
         <div className="flex flex-col gap-4">
+          <DispatchPanel sos={sos} />
+
           <Panel title="Priority">
             <fieldset
               className="flex min-w-0 flex-wrap gap-2 border-0 p-0"

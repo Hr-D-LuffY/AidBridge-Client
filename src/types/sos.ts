@@ -1,4 +1,5 @@
 import type { PaginationParams } from './api'
+import type { DispatchState } from './dispatch'
 import type {
   MediaResourceType,
   Priority,
@@ -52,6 +53,8 @@ export type SosRequest = {
   resolveReason: string | null
   // Present on the single-request read for the victim; the list does not carry it.
   task?: SosTaskSummary | null
+  // How the dispatch engine is treating the request. Admin and NGO only; absent for everyone else.
+  dispatch?: DispatchState
   createdAt: string
   updatedAt: string
 }

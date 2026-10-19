@@ -18,6 +18,13 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   [AuditAction.CAMP_VOLUNTEER_UNASSIGNED]: 'Volunteer removed from camp',
   [AuditAction.CAMP_DELETED]: 'Camp deleted',
   [AuditAction.BROADCAST_SENT]: 'Broadcast sent',
+  [AuditAction.DISPATCH_SETTINGS_CHANGED]: 'Dispatch settings changed',
+  [AuditAction.SOS_OFFERED]: 'Request offered to a volunteer',
+  [AuditAction.SOS_ASSIGNED]: 'Request assigned to a volunteer',
+  [AuditAction.SOS_UNASSIGNED]: 'Request taken back from a volunteer',
+  [AuditAction.SOS_DISPATCH_RUN]: 'Dispatch run by hand',
+  [AuditAction.SOS_DISPATCH_PAUSED]: 'Automatic dispatch paused',
+  [AuditAction.SOS_DISPATCH_RESUMED]: 'Automatic dispatch resumed',
 }
 
 export const AUDIT_TARGET_LABEL: Record<AuditTargetType, string> = {
@@ -27,6 +34,7 @@ export const AUDIT_TARGET_LABEL: Record<AuditTargetType, string> = {
   [AuditTargetType.INCIDENT]: 'Incident',
   [AuditTargetType.CAMP]: 'Camp',
   [AuditTargetType.NOTIFICATION]: 'Broadcast',
+  [AuditTargetType.DISPATCH_SETTINGS]: 'Dispatch settings',
 }
 
 function isKnown<T extends string>(map: Record<T, string>, key: string): key is T {

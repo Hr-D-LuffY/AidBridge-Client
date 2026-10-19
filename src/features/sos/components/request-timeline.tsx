@@ -9,12 +9,15 @@ import {
   Info,
   type LucideIcon,
   Navigation,
+  Pause,
+  Play,
   Radar,
   Send,
   TimerOff,
   TriangleAlert,
   Undo2,
   UserRoundCheck,
+  UserRoundMinus,
   UserRoundX,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -38,6 +41,9 @@ const EVENT_ICON: Record<SosEventType, LucideIcon> = {
   [SosEventType.BACKED_OUT]: UserRoundX,
   [SosEventType.ON_THE_WAY]: Navigation,
   [SosEventType.COMPLETED]: CheckCheck,
+  [SosEventType.UNASSIGNED]: UserRoundMinus,
+  [SosEventType.PAUSED]: Pause,
+  [SosEventType.RESUMED]: Play,
 }
 
 function iconFor(type: string): LucideIcon {

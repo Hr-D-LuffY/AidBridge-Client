@@ -32,6 +32,13 @@ const LINE_TEXT: Record<SosEventType, LineText> = {
   },
   [SosEventType.ON_THE_WAY]: { one: 'Your volunteer set off and is on the way.' },
   [SosEventType.COMPLETED]: { one: 'The volunteer finished the task.' },
+  [SosEventType.UNASSIGNED]: {
+    one: 'Our team took the request back from the volunteer. We are finding someone else.',
+  },
+  [SosEventType.PAUSED]: {
+    one: 'Our team paused automatic matching while they choose a volunteer by hand.',
+  },
+  [SosEventType.RESUMED]: { one: 'Automatic matching was switched back on.' },
 }
 
 const UNKNOWN_TEXT = 'Your request was updated.'
@@ -75,6 +82,7 @@ const SEARCH_RESETS: readonly string[] = [
   SosEventType.ACCEPTED,
   SosEventType.BACKED_OUT,
   SosEventType.SET_OFF_TIMEOUT,
+  SosEventType.UNASSIGNED,
 ]
 
 export type SearchState = {
