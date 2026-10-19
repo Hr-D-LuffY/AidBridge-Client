@@ -17,6 +17,8 @@ import { ResolvedBy, type SosRequest, TaskStatus } from '@/types'
 import { isSosFinished, useResolveSos, useSosQuery } from '../sos.queries'
 import { resolveReasonSchema } from '../sos.schema'
 import { EditSosSheet } from './edit-sos-sheet'
+import { RequestSearchCard } from './request-search-card'
+import { RequestTimeline } from './request-timeline'
 import { SosLocationPanel } from './sos-location-panel'
 import { SosMedia } from './sos-media'
 import { SosProgress } from './sos-progress'
@@ -115,6 +117,8 @@ export function SosDetailView({ id }: SosDetailViewProps) {
 
       <SosProgress status={sos.status} />
 
+      <RequestSearchCard sos={sos} />
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="flex flex-col gap-4">
           {sos.task?.status === TaskStatus.COMPLETED && (
@@ -169,6 +173,8 @@ export function SosDetailView({ id }: SosDetailViewProps) {
         </div>
 
         <div className="flex flex-col gap-4">
+          <RequestTimeline sos={sos} />
+
           <Panel title="Volunteer">
             {sos.assignedVolunteer ? (
               <div className="flex flex-col gap-2">

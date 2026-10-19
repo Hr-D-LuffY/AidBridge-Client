@@ -1,8 +1,25 @@
 import { clientApi } from '@/lib/api/client'
 import { MAX_ACTIVE_TASKS } from '@/lib/constants'
-import type { FullTask, RateTaskResult, Task, TaskListParams, TaskProgressStatus } from '@/types'
+import {
+  type FullTask,
+  type RateTaskResult,
+  type Task,
+  type TaskListParams,
+  type TaskProgressStatus,
+  TaskStatus,
+} from '@/types'
+import { hasOffer, type OfferTask } from './task.offer'
 import { ACTIVE_TASK_STATUSES } from './task.params'
 import { mergeActiveTasks } from './task.view'
+
+// A volunteer is offered a few requests at once (3 per round), so one page holds them all.
+const OFFERS_LIMIT = 20
+
+export type OffersResult = {
+  offers: OfferTask[]
+  // Server time minus device time, from the answer's Date header (0 when it is missing).
+  clockOffsetMs: number
+}
 
 const list = (params: TaskListParams, signal?: AbortSignal) =>
   clientApi.getList<Task>('/tasks', params, signal)
@@ -20,6 +37,21 @@ export const taskApi = {
     )
     return mergeActiveTasks(pages.map((page) => page.items))
   },
+  // Requests offered to me by the dispatch engine, an admin or an NGO and not answered yet.
+  offers: async (signal?: AbortSignal): Promise<OffersResult> => {
+    const result = await clientApi.request<Task[]>('/tasks', {
+      query: { status: TaskStatus.PENDING, limit: OFFERS_LIMIT },
+      signal,
+    })
+    return {
+      offers: result.data.filter(hasOffer),
+      clockOffsetMs: result.serverTime === null ? 0 : result.serverTime - Date.now(),
+    }
+  },
+  // Answers an offer. Accepting answers with the task (now accepted, the request in its full view); a
+  // 409 means the offer expired, someone else took the request, or I hold three tasks.
+  respond: (taskId: string, action: 'accept' | 'reject') =>
+    clientApi.put<Task>(`/tasks/${taskId}/respond`, { action }),
   // accepted -> on_the_way -> completed. Any other jump is a 409.
   setStatus: (taskId: string, status: TaskProgressStatus) =>
     clientApi.put<Task>(`/tasks/${taskId}/status`, { status }),

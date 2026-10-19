@@ -130,6 +130,16 @@ export function useRemoveSosMedia(id: string) {
   })
 }
 
+// What happened to a request so far. Asked for again every `pollMs` while the request is open (see
+// usePolling), so an offer, a widened search or an acceptance shows up without a reload.
+export function useSosTimelineQuery(id: string, pollMs: number | false = false) {
+  return useQuery({
+    queryKey: sosKeys.timeline(id),
+    queryFn: ({ signal }) => sosApi.timeline(id, signal),
+    refetchInterval: pollMs,
+  })
+}
+
 // Pending requests around a point, for a volunteer. `params` is null until the position is known, and
 // the query waits for it. `pollMs` comes from usePolling(), so a hidden tab sends nothing.
 export function useNearbySosQuery(params: NearbySosParams | null, pollMs: number | false) {
@@ -164,6 +174,7 @@ export function useAcceptSos() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: sosKeys.nearbyLists() })
       queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskKeys.offers() })
     },
   })
 }
@@ -185,6 +196,7 @@ export function useRejectSos() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: sosKeys.nearbyLists() })
       queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskKeys.offers() })
     },
   })
 }

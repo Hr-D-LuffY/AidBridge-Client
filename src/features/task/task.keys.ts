@@ -9,4 +9,7 @@ export const taskKeys = {
   detail: (id: string) => [...taskKeys.all, 'detail', id] as const,
   // The tasks being worked right now (accepted or on the way), at most three.
   active: () => [...taskKeys.all, 'active'] as const,
+  // Offers waiting for an answer. A root of its own: they are not tasks being worked, and the task
+  // caches are patched by status steps that must not touch them.
+  offers: () => ['offers'] as const,
 }

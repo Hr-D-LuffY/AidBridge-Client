@@ -26,6 +26,8 @@ export type ApiResult<T> = {
   message: string
   meta?: PaginationMeta
   status: number
+  // The server's clock when it answered (the `Date` header), in ms, or null when the header is missing.
+  serverTime: number | null
 }
 
 type ClientConfig = {
@@ -41,6 +43,11 @@ function cleanQuery(query: ApiQuery | undefined) {
     if (value !== undefined && value !== null && value !== '') cleaned[key] = value
   }
   return cleaned
+}
+
+function parseServerTime(header: string | null): number | null {
+  const time = header ? Date.parse(header) : Number.NaN
+  return Number.isNaN(time) ? null : time
 }
 
 function isEnvelope(payload: unknown): payload is ApiResponse<unknown> {
@@ -99,6 +106,7 @@ export function createApiClient({ baseURL, getHeaders }: ClientConfig) {
         message: payload.message,
         meta: payload.meta,
         status: response.status,
+        serverTime: parseServerTime(response.headers.get('date')),
       }
     } catch (error) {
       throw toApiError(error)

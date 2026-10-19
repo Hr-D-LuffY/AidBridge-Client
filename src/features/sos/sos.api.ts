@@ -9,6 +9,7 @@ import type {
   RejectSosResult,
   SosListParams,
   SosRequest,
+  SosTimelineItem,
   UpdateSosPayload,
 } from '@/types'
 import { toNearbyApiQuery, toSosApiQuery } from './sos.params'
@@ -19,6 +20,10 @@ export const sosApi = {
     clientApi.getList<SosRequest>('/sos', toSosApiQuery(params), signal),
   get: (id: string, signal?: AbortSignal) =>
     clientApi.get<SosRequest>(`/sos/${id}`, undefined, signal),
+  // Oldest first. A victim, the volunteer on it, an admin or an NGO may read it; the victim's version has
+  // no names. 100 is the most the backend returns in one page and more than a request ever collects.
+  timeline: (id: string, signal?: AbortSignal) =>
+    clientApi.getList<SosTimelineItem>(`/sos/${id}/timeline`, { limit: 100 }, signal),
   create: (payload: CreateSosPayload) => clientApi.post<SosRequest>('/sos', payload),
   // Only the fields that changed: the backend refuses an empty body and unknown fields.
   update: (id: string, payload: UpdateSosPayload) =>

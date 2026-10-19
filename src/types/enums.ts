@@ -33,8 +33,36 @@ export const TaskStatus = {
   ON_THE_WAY: 'on_the_way',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
+  // An offer nobody answered in time (terminal).
+  EXPIRED: 'expired',
 } as const
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+
+// Who made an offer (Task `offer.source`). `null` is a task the volunteer took on their own.
+export const OfferSource = {
+  AUTO: 'auto',
+  ADMIN: 'admin',
+  NGO: 'ngo',
+} as const
+export type OfferSource = (typeof OfferSource)[keyof typeof OfferSource]
+
+// What happened to a request (GET /sos/:id/timeline, `type`; API.md 12d). Later steps add values, so an
+// item's `type` is typed as a plain string and anything unknown reads as a general update.
+export const SosEventType = {
+  OFFERED: 'offered',
+  ACCEPTED: 'accepted',
+  DECLINED: 'declined',
+  EXPIRED: 'expired',
+  OFFERS_WITHDRAWN: 'offers_withdrawn',
+  ESCALATED: 'escalated',
+  PRIORITY_RAISED: 'priority_raised',
+  UNSERVED: 'unserved',
+  SET_OFF_TIMEOUT: 'set_off_timeout',
+  BACKED_OUT: 'backed_out',
+  ON_THE_WAY: 'on_the_way',
+  COMPLETED: 'completed',
+} as const
+export type SosEventType = (typeof SosEventType)[keyof typeof SosEventType]
 
 // Shared by SOS requests and incidents.
 export const Priority = {
@@ -173,5 +201,8 @@ export const NotificationType = {
   VOLUNTEER_REQUEST_APPROVED: 'volunteer_request_approved',
   VOLUNTEER_REQUEST_REJECTED: 'volunteer_request_rejected',
   INVENTORY_LOW: 'inventory_low',
+  TASK_OFFERED: 'task_offered',
+  OFFER_EXPIRED: 'offer_expired',
+  SOS_UNSERVED: 'sos_unserved',
 } as const
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

@@ -1,5 +1,5 @@
 import type { PaginationParams } from './api'
-import type { TaskStatus } from './enums'
+import type { OfferSource, TaskStatus } from './enums'
 import type { SosRequest, SosView } from './sos'
 
 // POST /tasks/:id/rate: the volunteer's new running average after a rating.
@@ -7,6 +7,14 @@ export type RateTaskResult = {
   taskId: string
   isRated: boolean
   volunteer: { id: string; reliabilityScore: number; totalRatings: number }
+}
+
+// How a task came to the volunteer, when the engine, an admin or an NGO offered it. A task with status
+// `pending` and an offer waits for an answer until `expiresAt`.
+export type TaskOffer = {
+  source: OfferSource | null
+  offeredAt: string
+  expiresAt: string
 }
 
 // One of the volunteer's tasks (GET /tasks, PUT /tasks/:id/status). The request inside it is the full
@@ -18,6 +26,8 @@ export type Task = {
   completedAt: string | null
   notes: string | null
   isRated: boolean
+  // null for a task the volunteer took on their own.
+  offer: TaskOffer | null
   sosRequest: SosView
   createdAt: string
   updatedAt: string

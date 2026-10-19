@@ -14,6 +14,7 @@ export const HISTORY_STATUSES = [
   TaskStatus.COMPLETED,
   TaskStatus.REJECTED,
   TaskStatus.CANCELLED,
+  TaskStatus.EXPIRED,
 ] as const
 export type HistoryStatus = (typeof HISTORY_STATUSES)[number]
 
@@ -21,6 +22,7 @@ export const HISTORY_OPTIONS: readonly { value: HistoryStatus; label: string }[]
   { value: TaskStatus.COMPLETED, label: 'Completed' },
   { value: TaskStatus.REJECTED, label: 'Declined' },
   { value: TaskStatus.CANCELLED, label: 'Cancelled' },
+  { value: TaskStatus.EXPIRED, label: 'Expired offers' },
 ]
 
 export type TaskHistoryView = {

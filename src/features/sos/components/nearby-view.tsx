@@ -14,6 +14,7 @@ import { PlacesMap } from '@/components/shared/places-map'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CurrentTasksPanel } from '@/features/task/components/current-tasks-panel'
+import { OffersPanel } from '@/features/task/components/offers-panel'
 import { TASK_MAP_LEGEND, toTaskMapPlace } from '@/features/task/task.map'
 import { useActiveTasksQuery } from '@/features/task/task.queries'
 import { OffDutyNotice } from '@/features/user/components/off-duty-notice'
@@ -177,6 +178,8 @@ export function NearbyView() {
       />
 
       <OffDutyNotice profile={session} />
+
+      <OffersPanel />
 
       <div className="flex flex-col gap-3">
         <LocationStatus

@@ -7,6 +7,8 @@ export const sosKeys = {
   lists: () => [...sosKeys.all, 'list'] as const,
   list: (params: SosListParams) => [...sosKeys.lists(), params] as const,
   detail: (id: string) => [...sosKeys.all, 'detail', id] as const,
+  // What happened to one request (offers, widening, escalation), for its victim.
+  timeline: (id: string) => [...sosKeys.all, 'timeline', id] as const,
   // A volunteer's map and list of requests around a point.
   nearbyLists: () => [...sosKeys.all, 'nearby'] as const,
   nearby: (params: NearbySosParams) => [...sosKeys.nearbyLists(), params] as const,

@@ -71,6 +71,7 @@ const STATUS_STYLES: { [K in StatusKind]: Record<StatusValues[K], BadgeStyle> } 
     on_the_way: { label: 'On the way', tone: 'high', icon: Navigation },
     completed: { label: 'Completed', tone: 'success', icon: CheckCheck },
     cancelled: { label: 'Cancelled', tone: 'neutral', icon: Ban },
+    expired: { label: 'Expired', tone: 'neutral', icon: Clock },
   },
   incident: {
     active: { label: 'Active', tone: 'high', icon: Flame },

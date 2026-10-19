@@ -40,6 +40,10 @@ const EMPTY_HISTORY: Record<HistoryStatus, { title: string; description: string 
     title: 'No cancelled tasks',
     description: 'A task is cancelled when the person closes their request before you finish.',
   },
+  [TaskStatus.EXPIRED]: {
+    title: 'No expired offers',
+    description: 'An offer you did not answer in time shows up here.',
+  },
 }
 
 function CardsSkeleton({ count, height }: { count: number; height: string }) {

@@ -43,6 +43,9 @@ function passThrough(upstream: Response) {
   const headers = new Headers()
   const contentType = upstream.headers.get('content-type')
   if (contentType) headers.set('content-type', contentType)
+  // The backend's clock, so a countdown can be corrected for a wrong clock on the device.
+  const date = upstream.headers.get('date')
+  if (date) headers.set('date', date)
   return new Response(upstream.body, { status: upstream.status, headers })
 }
 

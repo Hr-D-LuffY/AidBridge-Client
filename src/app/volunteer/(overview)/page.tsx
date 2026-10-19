@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { StatCard } from '@/components/shared/stat-card'
 import { getNearbySosPage } from '@/features/sos/sos.server'
 import { ActiveTaskList } from '@/features/task/components/active-task-list'
+import { OffersPanel } from '@/features/task/components/offers-panel'
 import { countTasks, getActiveTasks } from '@/features/task/task.server'
 import { DutyBadge, describeDuty } from '@/features/user/components/duty-status'
 import { OffDutyNotice } from '@/features/user/components/off-duty-notice'
@@ -57,6 +58,8 @@ export default async function VolunteerOverviewPage() {
       ) : (
         <OffDutyNotice profile={profile} withChoices />
       )}
+
+      <OffersPanel />
 
       <section aria-label="Your numbers" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard

@@ -1,6 +1,7 @@
 import {
   Ban,
   Bell,
+  BellRing,
   CheckCheck,
   CircleX,
   type LucideIcon,
@@ -10,6 +11,8 @@ import {
   PackageOpen,
   Pencil,
   ShieldCheck,
+  TimerOff,
+  TriangleAlert,
   UserRoundCheck,
   UserRoundX,
 } from 'lucide-react'
@@ -47,6 +50,9 @@ const TYPE_STYLES: Record<NotificationType, TypeStyle> = {
   [NotificationType.VOLUNTEER_REQUEST_APPROVED]: { icon: ShieldCheck, tone: 'success' },
   [NotificationType.VOLUNTEER_REQUEST_REJECTED]: { icon: CircleX, tone: 'neutral' },
   [NotificationType.INVENTORY_LOW]: { icon: PackageOpen, tone: 'warning' },
+  [NotificationType.TASK_OFFERED]: { icon: BellRing, tone: 'high' },
+  [NotificationType.OFFER_EXPIRED]: { icon: TimerOff, tone: 'neutral' },
+  [NotificationType.SOS_UNSERVED]: { icon: TriangleAlert, tone: 'danger' },
 }
 
 function isOneOf<T extends string>(map: Record<T, unknown>, key: string): key is T {
@@ -79,9 +85,10 @@ export const CATEGORY_HELP: Record<NotificationCategory, string> = {
   [NotificationCategory.REQUESTS]:
     'A volunteer accepted, is on the way or has rescued you, and new chat messages.',
   [NotificationCategory.TASKS]:
-    'Changes to the tasks you are doing, such as the request being edited.',
+    'Offers to help, and changes to the tasks you are doing, such as the request being edited.',
   [NotificationCategory.CAMPS]: 'Alerts about your camps, such as an item running low.',
-  [NotificationCategory.SAFETY]: 'Safety news, such as a volunteer backing out of your request.',
+  [NotificationCategory.SAFETY]:
+    'Safety news, such as a volunteer backing out of your request, or a request nobody could be found for.',
   [NotificationCategory.SYSTEM]:
     'Announcements from administrators and the decision on a volunteer request.',
 }
@@ -123,6 +130,14 @@ export function getNotificationLink(
         href: `/dashboard/sos/${sosRequestId}`,
         label: conversation ? 'Open the conversation' : 'Open the request',
       }
+    }
+    if (role === Role.VOLUNTEER && type === NotificationType.TASK_OFFERED) {
+      // The offer is not a task yet, so it has no task page: the offers panel on the overview holds it.
+      return { href: '/volunteer#offers', label: 'See the offer' }
+    }
+    if (role === Role.VOLUNTEER && type === NotificationType.OFFER_EXPIRED) {
+      // An expired offer stays on the volunteer's map until someone takes it.
+      return { href: `/volunteer/nearby/${sosRequestId}`, label: 'See the request' }
     }
     if (role === Role.VOLUNTEER) {
       return {

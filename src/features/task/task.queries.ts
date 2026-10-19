@@ -3,6 +3,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { sosKeys } from '@/features/sos/sos.keys'
+import { getErrorMessage } from '@/lib/api/errors'
 import {
   type Paginated,
   type SosRequest,
@@ -13,6 +14,7 @@ import {
 } from '@/types'
 import { taskApi } from './task.api'
 import { taskKeys } from './task.keys'
+import { classifyOfferFailure, OFFER_FAILURE_TEXT } from './task.offer'
 import { isActiveTaskStatus } from './task.params'
 import { SOS_STATUS_FOR_TASK } from './task.view'
 
@@ -23,6 +25,47 @@ export function useTasksQuery(params: TaskListParams) {
     queryFn: ({ signal }) => taskApi.list(params, signal),
     // Keep showing the old page while the next one loads, so a filter change does not flash a skeleton.
     placeholderData: keepPreviousData,
+  })
+}
+
+// The offers waiting for the volunteer's answer, with the server-clock offset the countdown needs. Asked
+// for again every `pollMs` (see usePolling), so a new offer shows up and an old one drops off by itself.
+export function useOffersQuery(pollMs: number | false = false) {
+  return useQuery({
+    queryKey: taskKeys.offers(),
+    queryFn: ({ signal }) => taskApi.offers(signal),
+    refetchInterval: pollMs,
+  })
+}
+
+// Accepts or declines an offer. A 409 is explained kindly (it ran out, someone was first, three tasks) and
+// the lists are read again either way, so what is shown is what the server holds. The caller moves on to
+// the new task when an accept succeeds.
+export function useRespondToOffer() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ taskId, action }: { taskId: string; action: 'accept' | 'reject' }) =>
+      taskApi.respond(taskId, action),
+    meta: { skipGlobalError: true },
+    onSuccess: (_task, { action }) => {
+      toast.success(
+        action === 'accept'
+          ? 'Offer accepted. Their phone number and exact location are now yours.'
+          : 'Offer declined. You will not see this request again.',
+      )
+    },
+    onError: (error) => {
+      const failure = classifyOfferFailure(error)
+      const { title, description } = OFFER_FAILURE_TEXT[failure]
+      toast.error(title, {
+        description: failure === 'other' ? getErrorMessage(error) : description,
+      })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.offers() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      queryClient.invalidateQueries({ queryKey: sosKeys.nearbyLists() })
+    },
   })
 }
 

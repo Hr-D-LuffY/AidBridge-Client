@@ -88,6 +88,14 @@ export type UpdateSosPayload = Partial<CreateSosPayload> & {
   removeMediaIds?: string[]
 }
 
+// One thing that happened to a request (GET /sos/:id/timeline), as its victim or an involved volunteer
+// sees it: no names, no distances. Admins and NGOs get more (Part 17).
+export type SosTimelineItem = {
+  id: string
+  type: string
+  at: string
+}
+
 // What a volunteer sees of a request they have not taken (GET /sos/nearby, and GET /sos/:id while it is
 // pending): the first name, a position rounded to about 1 km, no phone, no street address, no photos.
 export type LimitedSos = {

@@ -51,6 +51,8 @@ export const POLL_INTERVAL_MS = {
   notifications: 30_000,
   // A volunteer's offers expire in minutes, so their bell looks twice as often (decision A14).
   volunteerNotifications: 15_000,
+  // Offers last at least 5 minutes (critical) and usually 15, so a volunteer's list looks every 15 s.
+  offers: 15_000,
   // An NGO watching camps and open requests on the live map.
   liveMap: 30_000,
 } as const
