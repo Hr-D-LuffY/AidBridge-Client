@@ -4,6 +4,7 @@ import { fieldContext, formContext } from '@/components/forms/form-context'
 import { NeedsField } from '@/components/forms/needs-field'
 import { PasswordField } from '@/components/forms/password-field'
 import { SelectField } from '@/components/forms/select-field'
+import { SkillsField } from '@/components/forms/skills-field'
 import { SubmitButton } from '@/components/forms/submit-button'
 import { TextField } from '@/components/forms/text-field'
 import { TextareaField } from '@/components/forms/textarea-field'
@@ -22,6 +23,7 @@ export const { useAppForm } = createFormHook({
     TextareaField,
     PasswordField,
     NeedsField,
+    SkillsField,
     SelectField,
     CheckboxField,
   },

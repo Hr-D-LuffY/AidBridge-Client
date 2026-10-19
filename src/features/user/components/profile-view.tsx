@@ -12,6 +12,7 @@ import { ChangePasswordForm } from './change-password-form'
 import { DeleteAccount } from './delete-account'
 import { DetailsForm } from './details-form'
 import { ProfileSection } from './profile-section'
+import { SkillsSettings } from './skills-settings'
 import { VolunteerSettings } from './volunteer-settings'
 
 // The same page for all four roles under their own area (/dashboard/profile, /volunteer/profile, ...),
@@ -56,6 +57,15 @@ export function ProfileView() {
           />
 
           {profile.role === Role.VOLUNTEER && <VolunteerSettings profile={profile} />}
+
+          {profile.role === Role.VOLUNTEER && (
+            <ProfileSection
+              title="Skills and languages"
+              description="What you can help with and who you can talk to."
+            >
+              <SkillsSettings profile={profile} />
+            </ProfileSection>
+          )}
 
           <ProfileSection
             title="Notifications"

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { buttonVariants } from '@/components/ui/button'
 import { ChatPanel } from '@/features/message/components/chat-panel'
@@ -115,6 +116,7 @@ export function TaskDetailView({ id }: TaskDetailViewProps) {
 
           <Panel title="What they asked for">
             <ReliefBadges categories={sos.needs} />
+            <RequestedSkills skills={sos.requiredSkills} />
             {sos.description ? (
               <p className="text-pretty whitespace-pre-line">{sos.description}</p>
             ) : (

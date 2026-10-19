@@ -19,7 +19,7 @@ import type { CreateSosPayload } from '@/types'
 import { useCreateSos } from '../sos.queries'
 import { type SosFieldsInput, sosFieldsSchema } from '../sos.schema'
 
-const FIELD_NAMES = ['needs', 'description', 'address'] as const
+const FIELD_NAMES = ['needs', 'requiredSkills', 'description', 'address'] as const
 
 // The most important screen of the product. The map comes first with the location box floating on it;
 // the details sit in a panel beside it (below it on a phone) with Send pinned to the bottom. The
@@ -35,7 +35,12 @@ export function RaiseSosForm() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   const form = useAppForm({
-    defaultValues: { needs: [], description: '', address: '' } as SosFieldsInput,
+    defaultValues: {
+      needs: [],
+      requiredSkills: [],
+      description: '',
+      address: '',
+    } as SosFieldsInput,
     validators: { onChange: sosFieldsSchema },
     onSubmit: async ({ value, formApi }) => {
       setServerError(null)
@@ -50,6 +55,7 @@ export function RaiseSosForm() {
       const payload: CreateSosPayload = {
         needs: fields.needs,
         coordinates: toLngLat(location.position),
+        ...(fields.requiredSkills.length > 0 && { requiredSkills: fields.requiredSkills }),
         ...(fields.description && { description: fields.description }),
         ...(fields.address && { address: fields.address }),
       }
@@ -124,6 +130,15 @@ export function RaiseSosForm() {
 
         <form.AppField name="needs">
           {(field) => <field.NeedsField label="What do you need?" />}
+        </form.AppField>
+
+        <form.AppField name="requiredSkills">
+          {(field) => (
+            <field.SkillsField
+              label="Special help needed"
+              hint="Tick only what applies. Your request is sent either way."
+            />
+          )}
         </form.AppField>
 
         <form.AppField name="address">

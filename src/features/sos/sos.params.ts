@@ -1,7 +1,14 @@
 import type { ApiQuery } from '@/lib/api/core'
 import { DEFAULT_PAGE } from '@/lib/constants'
 import { asDate, asList } from '@/lib/params'
-import { Priority, ReliefCategory, type SosListParams, SosSort, SosStatus } from '@/types'
+import {
+  type NearbySosParams,
+  Priority,
+  ReliefCategory,
+  type SosListParams,
+  SosSort,
+  SosStatus,
+} from '@/types'
 
 // How many request cards a page shows on "My requests".
 export const SOS_PAGE_SIZE = 6
@@ -89,4 +96,10 @@ export function toSosApiQuery(params: SosListParams): ApiQuery {
     priority: priority?.join(','),
     needs: needs?.join(','),
   }
+}
+
+// GET /sos/nearby: the skills filter goes as one comma-separated value, like the other lists.
+export function toNearbyApiQuery(params: NearbySosParams): ApiQuery {
+  const { skills, ...rest } = params
+  return { ...rest, skills: skills?.length ? skills.join(',') : undefined }
 }

@@ -1,25 +1,18 @@
 'use client'
 
-import { MapPin, Save, Star, TriangleAlert } from 'lucide-react'
+import { MapPin, Save, Star } from 'lucide-react'
 import { LocationMap } from '@/components/shared/location-map'
 import { Switch } from '@/components/shared/switch'
 import { Button } from '@/components/ui/button'
 import { useLocationField } from '@/hooks/use-location-field'
-import { getErrorMessage } from '@/lib/api/errors'
 import { RATING_MAX } from '@/lib/constants'
 import { fromGeoPoint, toLngLat } from '@/lib/geo'
 import type { UserProfile } from '@/types'
 import { useUpdateProfile } from '../user.queries'
+import { DutyChoices } from './duty-choices'
+import { DutyBadge, describeDuty } from './duty-status'
+import { ErrorLine } from './error-line'
 import { ProfileSection } from './profile-section'
-
-function ErrorLine({ error }: { error: unknown }) {
-  return (
-    <p role="alert" className="flex items-start gap-2 text-sm text-destructive">
-      <TriangleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-      {getErrorMessage(error)}
-    </p>
-  )
-}
 
 // "Available for requests": a switch that saves as soon as it is flipped. While the save runs it shows
 // the new state, and goes back to the saved one if the save fails.
@@ -37,7 +30,8 @@ function AvailabilitySwitch({ profile }: { profile: UserProfile }) {
             {available ? 'Available' : 'Not available'}
           </span>
           <span id="availability-hint" className="text-sm text-muted-foreground">
-            Turn this off when you cannot take on work, so NGOs and administrators know.
+            Turn this off when you cannot take on work, so NGOs and administrators know. It also
+            puts you off duty.
           </span>
         </div>
         <Switch
@@ -49,6 +43,20 @@ function AvailabilitySwitch({ profile }: { profile: UserProfile }) {
         />
       </div>
       {update.isError && <ErrorLine error={update.error} />}
+    </div>
+  )
+}
+
+// Whether the volunteer is on the clock right now, and for how long. `isOnDuty` comes from the backend
+// (available and not past the duty time), so the page never works it out from the clock.
+function DutyPanel({ profile }: { profile: UserProfile }) {
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border p-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <DutyBadge isOnDuty={profile.isOnDuty} />
+        <p className="text-sm font-medium">{describeDuty(profile)}</p>
+      </div>
+      <DutyChoices profile={profile} />
     </div>
   )
 }
@@ -134,6 +142,7 @@ export function VolunteerSettings({ profile }: { profile: UserProfile }) {
       description="How administrators and NGOs find and rely on you."
     >
       <AvailabilitySwitch profile={profile} />
+      <DutyPanel profile={profile} />
       <Reliability profile={profile} />
       {/* A new saved location starts the editor fresh, so a placed pin does not linger. */}
       <LocationEditor key={profile.location?.coordinates.join(',') ?? 'none'} profile={profile} />

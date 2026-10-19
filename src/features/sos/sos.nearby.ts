@@ -43,6 +43,7 @@ export function toNearbyMapPlace(sos: NearbySos): MapPlace {
       { label: 'Needs', value: formatReliefList(sos.needs) },
       { label: 'Distance', value: `about ${formatDistance(sos.distanceMeters)}` },
       { label: 'Raised', value: formatRelativeTime(sos.createdAt) },
+      ...(sos.skillMatch ? [{ label: 'Skills', value: 'Matches your skills' }] : []),
     ],
     status: { label: `${PRIORITY_LABEL[sos.priority]} priority`, tone },
   }

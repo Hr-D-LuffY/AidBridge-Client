@@ -1,11 +1,13 @@
 'use client'
 
-import { ArrowRight, MapPinned } from 'lucide-react'
+import { ArrowRight, MapPinned, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge } from '@/components/shared/status-badge'
 import { Badge } from '@/components/ui/badge'
 import { formatDistance, formatRelativeTime } from '@/lib/format'
+import { formatSkillList } from '@/lib/skills'
 import { cn } from '@/lib/utils'
 import type { NearbySos } from '@/types'
 import { RequestActions } from './request-actions'
@@ -40,6 +42,18 @@ export function NearbyCard({ sos, selected, onShowOnMap }: NearbyCardProps) {
       </div>
 
       <ReliefBadges categories={sos.needs} />
+      <RequestedSkills skills={sos.requiredSkills} />
+      {sos.skillMatch && (
+        <p className="flex w-fit items-start gap-1.5 rounded-lg bg-success-soft px-2.5 py-1.5 text-sm font-medium text-success">
+          <Sparkles aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <span>
+            Matches your skills
+            {sos.matchedSkills.length > 0 && (
+              <span className="font-normal"> ({formatSkillList(sos.matchedSkills)})</span>
+            )}
+          </span>
+        </p>
+      )}
       {sos.description && (
         <p className="line-clamp-3 text-sm text-pretty text-muted-foreground">{sos.description}</p>
       )}

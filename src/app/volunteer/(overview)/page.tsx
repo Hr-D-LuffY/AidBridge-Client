@@ -1,4 +1,4 @@
-import { CircleCheck, ListChecks, MapPinOff, Radar, Star, Tent, UserRoundX } from 'lucide-react'
+import { CircleCheck, ListChecks, MapPinOff, Radar, Star, Tent } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PageHeader } from '@/components/shared/page-header'
@@ -6,6 +6,8 @@ import { StatCard } from '@/components/shared/stat-card'
 import { getNearbySosPage } from '@/features/sos/sos.server'
 import { ActiveTaskList } from '@/features/task/components/active-task-list'
 import { countTasks, getActiveTasks } from '@/features/task/task.server'
+import { DutyBadge, describeDuty } from '@/features/user/components/duty-status'
+import { OffDutyNotice } from '@/features/user/components/off-duty-notice'
 import { requireRole } from '@/lib/auth/require-role'
 import { DEFAULT_SOS_RADIUS_KM, MAX_ACTIVE_TASKS, RATING_MAX } from '@/lib/constants'
 import { formatDistance } from '@/lib/format'
@@ -47,20 +49,13 @@ export default async function VolunteerOverviewPage() {
         description="Find people who need help near you, follow the requests you have taken, and hand out aid from your camps."
       />
 
-      {!profile.isAvailable && (
-        <p className="flex items-start gap-2 rounded-xl border border-warning/40 bg-warning-soft p-3 text-sm">
-          <UserRoundX aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-warning" />
-          <span>
-            You are marked as not available.{' '}
-            <Link
-              href="/volunteer/profile"
-              className="font-medium text-link underline-offset-4 hover:underline"
-            >
-              Turn availability back on
-            </Link>{' '}
-            when you can help.
-          </span>
+      {profile.isOnDuty ? (
+        <p className="flex flex-wrap items-center gap-2 text-sm">
+          <DutyBadge isOnDuty />
+          <span className="font-medium">{describeDuty(profile)}</span>
         </p>
+      ) : (
+        <OffDutyNotice profile={profile} withChoices />
       )}
 
       <section aria-label="Your numbers" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

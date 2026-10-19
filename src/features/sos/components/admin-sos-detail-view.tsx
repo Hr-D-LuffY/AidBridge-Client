@@ -3,6 +3,7 @@
 import { MessageSquare, Phone, UserRound } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { ChatPanel } from '@/features/message/components/chat-panel'
 import { usePolling } from '@/hooks/use-polling'
@@ -99,6 +100,7 @@ export function AdminSosDetailView({ id }: { id: string }) {
 
           <Panel title="What was asked for">
             <ReliefBadges categories={sos.needs} />
+            <RequestedSkills skills={sos.requiredSkills} />
             {sos.description ? (
               <p className="text-pretty whitespace-pre-line">{sos.description}</p>
             ) : (

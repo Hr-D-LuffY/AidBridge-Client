@@ -2,10 +2,12 @@ import { Ban, Mail, MapPin, Phone, Star } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/shared/page-header'
+import { SkillBadges } from '@/components/shared/skill-chips'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { UserAvatar } from '@/components/shared/user-avatar'
 import { Badge } from '@/components/ui/badge'
 import { BlockAccountPanel } from '@/features/user/components/block-account-panel'
+import { DutyBadge, describeDuty } from '@/features/user/components/duty-status'
 import { getUser } from '@/features/user/user.server'
 import { isApiError } from '@/lib/api/errors'
 import { RATING_MAX } from '@/lib/constants'
@@ -91,6 +93,12 @@ export default async function UserDetailPage({ params }: PageProps) {
               <Detail label="Availability">
                 {user.isAvailable ? 'Available for requests' : 'Not available'}
               </Detail>
+              <Detail label="Duty">
+                <span className="flex flex-wrap items-center gap-2">
+                  <DutyBadge isOnDuty={user.isOnDuty} />
+                  <span className="text-sm">{describeDuty(user)}</span>
+                </span>
+              </Detail>
               <Detail label="Rating">
                 <span className="inline-flex items-center gap-1.5">
                   <Star aria-hidden="true" className="size-4" />
@@ -98,6 +106,24 @@ export default async function UserDetailPage({ params }: PageProps) {
                     ? `${user.reliabilityScore.toFixed(1)} / ${RATING_MAX} from ${user.totalRatings} ${user.totalRatings === 1 ? 'rating' : 'ratings'}`
                     : 'Not rated yet'}
                 </span>
+              </Detail>
+            </>
+          )}
+          {isVolunteer && (
+            <>
+              <Detail label="Skills">
+                {user.skills.length > 0 ? (
+                  <SkillBadges skills={user.skills} />
+                ) : (
+                  <span className="text-muted-foreground">None added</span>
+                )}
+              </Detail>
+              <Detail label="Languages">
+                {user.languages.length > 0 ? (
+                  user.languages.join(', ')
+                ) : (
+                  <span className="text-muted-foreground">None added</span>
+                )}
               </Detail>
             </>
           )}

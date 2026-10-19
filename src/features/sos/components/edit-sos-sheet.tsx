@@ -22,7 +22,7 @@ import { useUpdateSos } from '../sos.queries'
 import { type SosFieldsInput, sosFieldsSchema } from '../sos.schema'
 import { SosMediaEditor } from './sos-media-editor'
 
-const FIELD_NAMES = ['needs', 'description', 'address', 'coordinates'] as const
+const FIELD_NAMES = ['needs', 'requiredSkills', 'description', 'address', 'coordinates'] as const
 
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((item) => b.includes(item))
@@ -48,6 +48,7 @@ export function EditSosSheet({ sos, open, onOpenChange }: EditSosSheetProps) {
   const form = useAppForm({
     defaultValues: {
       needs: sos.needs,
+      requiredSkills: sos.requiredSkills,
       description: sos.description ?? '',
       address: sos.address ?? '',
     } as SosFieldsInput,
@@ -58,6 +59,9 @@ export function EditSosSheet({ sos, open, onOpenChange }: EditSosSheetProps) {
 
       const changes: UpdateSosPayload = {}
       if (!sameSet(fields.needs, sos.needs)) changes.needs = fields.needs
+      if (!sameSet(fields.requiredSkills, sos.requiredSkills)) {
+        changes.requiredSkills = fields.requiredSkills
+      }
       if (fields.description !== (sos.description ?? '')) changes.description = fields.description
       if (fields.address !== (sos.address ?? '')) changes.address = fields.address
       if (newPosition) changes.coordinates = toLngLat(newPosition)
@@ -100,6 +104,10 @@ export function EditSosSheet({ sos, open, onOpenChange }: EditSosSheetProps) {
         >
           <form.AppField name="needs">
             {(field) => <field.NeedsField label="What do you need?" />}
+          </form.AppField>
+
+          <form.AppField name="requiredSkills">
+            {(field) => <field.SkillsField label="Special help needed" />}
           </form.AppField>
 
           <form.AppField name="address">

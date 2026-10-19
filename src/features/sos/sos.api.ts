@@ -11,7 +11,7 @@ import type {
   SosRequest,
   UpdateSosPayload,
 } from '@/types'
-import { toSosApiQuery } from './sos.params'
+import { toNearbyApiQuery, toSosApiQuery } from './sos.params'
 
 // One function per endpoint, for the browser (through the BFF). Server pages use sos.server.ts.
 export const sosApi = {
@@ -35,7 +35,7 @@ export const sosApi = {
   // Volunteers. Pending requests around a point, nearest first, in the limited view (no phone, no
   // street address, no photos).
   nearby: (params: NearbySosParams, signal?: AbortSignal) =>
-    clientApi.getList<NearbySos>('/sos/nearby', params, signal),
+    clientApi.getList<NearbySos>('/sos/nearby', toNearbyApiQuery(params), signal),
   // Takes the request: 200 with the full view and the new task, or 409 (taken meanwhile, three active
   // tasks already, or declined earlier).
   accept: (id: string) => clientApi.put<AcceptSosResult>(`/sos/${id}/accept`),

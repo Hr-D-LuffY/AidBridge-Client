@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LocationMap } from '@/components/shared/location-map'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { formatDateTime, formatRelativeTime } from '@/lib/format'
 import { fromGeoPoint } from '@/lib/geo'
@@ -43,6 +44,7 @@ export function NearbyDetailView({ sos }: { sos: LimitedSos }) {
         <div className="flex flex-col gap-4">
           <Panel title="What they need">
             <ReliefBadges categories={sos.needs} />
+            <RequestedSkills skills={sos.requiredSkills} />
             {sos.description ? (
               <p className="text-pretty whitespace-pre-line">{sos.description}</p>
             ) : (

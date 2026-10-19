@@ -9,7 +9,7 @@ import type {
   SosStatus,
   SosView,
 } from '@/types'
-import { toSosApiQuery } from './sos.params'
+import { toNearbyApiQuery, toSosApiQuery } from './sos.params'
 
 // The same endpoints for Server Components, which call the backend directly.
 export function getSosPage(params: SosListParams): Promise<Paginated<SosRequest>> {
@@ -28,7 +28,7 @@ export function getSosView(id: string): Promise<SosView> {
 
 // Pending requests around a point, nearest first (volunteers).
 export function getNearbySosPage(params: NearbySosParams): Promise<Paginated<NearbySos>> {
-  return serverApi.getList<NearbySos>('/sos/nearby', params)
+  return serverApi.getList<NearbySos>('/sos/nearby', toNearbyApiQuery(params))
 }
 
 // How many of my requests have this status (only the `meta.total` is read).

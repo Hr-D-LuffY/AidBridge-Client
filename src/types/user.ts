@@ -1,4 +1,4 @@
-import type { Role } from './enums'
+import type { Role, Skill } from './enums'
 
 // GeoJSON point, as the backend stores and returns it. Coordinates are [lng, lat].
 export type GeoPoint = {
@@ -17,6 +17,14 @@ export type UserProfile = {
   email: string
   phone?: string | null
   location: GeoPoint | null
+  // Volunteers only; empty for everyone else.
+  skills: Skill[]
+  languages: string[]
+  // When the volunteer's duty ends; null means until they switch off. Only the user and admins get it.
+  onDutyUntil: string | null
+  // The effective state: available AND the duty time is empty or still ahead. Show this, not
+  // `isAvailable`, as "On duty / Off duty". Always false for anyone who is not a volunteer.
+  isOnDuty: boolean
   // An admin can block an account. Only an admin (or the user themself, who cannot be blocked while
   // reading it) gets this profile, so these are what the admin's Users pages show.
   isBlocked?: boolean
@@ -49,13 +57,18 @@ export type SessionUser = {
   role: Role
 }
 
-// PUT /auth/me takes any of these (at least one). Email and role cannot be changed.
+// PUT /auth/me takes any of these (at least one). Email and role cannot be changed. The last three are
+// for volunteers only (anyone else gets a 400 and nothing is saved). `skills` and `languages` replace the
+// whole list; `onDutyUntil` is an ISO date-time up to 7 days ahead, or null for "until I switch off".
 export type UpdateProfilePayload = {
   name?: string
   phone?: string
   // [lng, lat]
   location?: [number, number]
   isAvailable?: boolean
+  skills?: Skill[]
+  languages?: string[]
+  onDutyUntil?: string | null
 }
 
 // A volunteer as an NGO sees them (GET /users?role=volunteer): the limited profile plus the contact
@@ -69,6 +82,9 @@ export type VolunteerContact = {
   totalRatings: number
   email: string
   phone: string | null
+  skills: Skill[]
+  languages: string[]
+  isOnDuty: boolean
 }
 
 export type VolunteerListParams = {

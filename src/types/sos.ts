@@ -4,6 +4,7 @@ import type {
   Priority,
   ReliefCategory,
   ResolvedBy,
+  Skill,
   SosSort,
   SosStatus,
   TaskStatus,
@@ -38,6 +39,8 @@ export type SosRequest = {
   victim: SosPerson
   assignedVolunteer: SosPerson | null
   needs: ReliefCategory[]
+  // The "special help" the victim asked for; empty when none.
+  requiredSkills: Skill[]
   description: string | null
   media: MediaItem[]
   location: GeoPoint
@@ -72,6 +75,8 @@ export type SosListParams = PaginationParams & {
 
 export type CreateSosPayload = {
   needs: ReliefCategory[]
+  // Optional, at most 4. Never blocks sending; [] on an update clears it.
+  requiredSkills?: Skill[]
   // [lng, lat]
   coordinates: [number, number]
   description?: string
@@ -89,6 +94,7 @@ export type LimitedSos = {
   id: string
   victim: { name: string }
   needs: ReliefCategory[]
+  requiredSkills: Skill[]
   description: string | null
   approximateLocation: GeoPoint
   priority: Priority
@@ -98,13 +104,21 @@ export type LimitedSos = {
   distanceMeters?: number
 }
 
-export type NearbySos = LimitedSos & { distanceMeters: number }
+// `skillMatch`: this volunteer has a skill the request wants (asked for outright or implied by a need);
+// `matchedSkills` says which. A badge only: a volunteer without the skill still sees and can accept it.
+export type NearbySos = LimitedSos & {
+  distanceMeters: number
+  skillMatch: boolean
+  matchedSkills: Skill[]
+}
 
 export type NearbySosParams = PaginationParams & {
   lng: number
   lat: number
   // metres, 50 000 at most
   radius?: number
+  // Keep only requests that want any of these skills.
+  skills?: Skill[]
 }
 
 // GET /sos/:id answers a volunteer with the full request once it is theirs and the limited one while it

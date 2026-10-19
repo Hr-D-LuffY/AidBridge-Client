@@ -4,6 +4,7 @@ import { Phone, UserRound } from 'lucide-react'
 import { ListErrorState } from '@/components/shared/list-error-state'
 import { LocationMap } from '@/components/shared/location-map'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import {
   Sheet,
@@ -62,6 +63,7 @@ function Details({ sos }: { sos: SosRequest }) {
 
       <Section title="What was asked for">
         <ReliefBadges categories={sos.needs} />
+        <RequestedSkills skills={sos.requiredSkills} />
         {sos.description ? (
           <p className="text-pretty whitespace-pre-line">{sos.description}</p>
         ) : (

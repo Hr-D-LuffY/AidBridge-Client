@@ -1,7 +1,6 @@
 'use client'
 
-import { MapPinned, Radar, TriangleAlert, UserRoundX } from 'lucide-react'
-import Link from 'next/link'
+import { MapPinned, Radar, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -9,12 +8,15 @@ import { FilterChips } from '@/components/shared/filter-chips'
 import { ListErrorState } from '@/components/shared/list-error-state'
 import { LocationStatus } from '@/components/shared/location-status'
 import { MapControlBar } from '@/components/shared/map-control-bar'
+import { MultiFilterChips } from '@/components/shared/multi-filter-chips'
 import { PageHeader } from '@/components/shared/page-header'
 import { PlacesMap } from '@/components/shared/places-map'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CurrentTasksPanel } from '@/features/task/components/current-tasks-panel'
 import { TASK_MAP_LEGEND, toTaskMapPlace } from '@/features/task/task.map'
 import { useActiveTasksQuery } from '@/features/task/task.queries'
+import { OffDutyNotice } from '@/features/user/components/off-duty-notice'
 import { useLocationField } from '@/hooks/use-location-field'
 import { usePolling } from '@/hooks/use-polling'
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion'
@@ -27,8 +29,10 @@ import {
   SOS_RADIUS_OPTIONS_KM,
 } from '@/lib/constants'
 import { fromGeoPoint } from '@/lib/geo'
+import { asList } from '@/lib/params'
+import { SKILL_OPTIONS } from '@/lib/skills'
 import { cn } from '@/lib/utils'
-import { type NearbySos, Priority } from '@/types'
+import { type NearbySos, Priority, Skill } from '@/types'
 import {
   NEARBY_MAP_LEGEND,
   NEARBY_SORT_OPTIONS,
@@ -83,6 +87,8 @@ export function NearbyView() {
   const radiusKm =
     SOS_RADIUS_OPTIONS_KM.find((km) => String(km) === params.get('radius')) ?? DEFAULT_SOS_RADIUS_KM
   const sort = parseNearbySort(params.get('sort'))
+  // ?skills=boat,medical keeps the requests that want any of them; a hand-edited value means no filter.
+  const skills = asList(Object.values(Skill), params.get('skills'))
 
   const profilePosition = session.location ? fromGeoPoint(session.location) : null
   const origin = location.position ?? profilePosition
@@ -95,6 +101,7 @@ export function NearbyView() {
           lat: roundCoordinate(origin.lat),
           radius: radiusKm * 1000,
           limit: NEARBY_PAGE_SIZE,
+          ...(skills.length > 0 && { skills }),
         }
       : null,
     poll,
@@ -141,7 +148,11 @@ export function NearbyView() {
       <EmptyState
         icon={Radar}
         title={`No open requests within ${radiusKm} km`}
-        description="That is good news. New requests appear here on their own, or try a wider radius."
+        description={
+          skills.length > 0
+            ? 'None of them ask for the skills you picked. Clear the skills filter to see every request.'
+            : 'That is good news. New requests appear here on their own, or try a wider radius.'
+        }
       />
     )
   } else {
@@ -165,22 +176,7 @@ export function NearbyView() {
         description="People waiting for a volunteer, nearest first. You see a first name and a rounded position only; the phone number and exact location are shared when you accept."
       />
 
-      {!session.isAvailable && (
-        <p className="flex items-start gap-2 rounded-xl border border-warning/40 bg-warning-soft p-3 text-sm">
-          <UserRoundX aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-warning" />
-          <span>
-            You are marked as not available. You can still take requests, but turn availability back
-            on in{' '}
-            <Link
-              href="/volunteer/profile"
-              className="font-medium text-link underline-offset-4 hover:underline"
-            >
-              your profile
-            </Link>{' '}
-            when you can help.
-          </span>
-        </p>
-      )}
+      <OffDutyNotice profile={session} />
 
       <div className="flex flex-col gap-3">
         <LocationStatus
@@ -280,6 +276,25 @@ export function NearbyView() {
               value={sort}
               onChange={(next) => next && params.set({ sort: next })}
             />
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <MultiFilterChips
+            label="Skills"
+            allLabel="Any"
+            options={SKILL_OPTIONS}
+            value={skills}
+            onChange={(next) => params.set({ skills: next.join(',') })}
+          />
+          {skills.length === 0 && session.skills.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 px-4"
+              onClick={() => params.set({ skills: session.skills.join(',') })}
+            >
+              Use my skills
+            </Button>
           )}
         </div>
         {query.isError && origin && query.data && (

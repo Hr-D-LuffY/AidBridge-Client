@@ -56,6 +56,19 @@ export const ReliefCategory = {
 } as const
 export type ReliefCategory = (typeof ReliefCategory)[keyof typeof ReliefCategory]
 
+// What a volunteer can do (PUT /auth/me `skills`) and what a victim can ask for (SOS `requiredSkills`).
+export const Skill = {
+  MEDICAL: 'medical',
+  FIRST_AID: 'first_aid',
+  SEARCH_RESCUE: 'search_rescue',
+  BOAT: 'boat',
+  DRIVING: 'driving',
+  FOOD_DISTRIBUTION: 'food_distribution',
+  SHELTER_MANAGEMENT: 'shelter_management',
+  COUNSELLING: 'counselling',
+} as const
+export type Skill = (typeof Skill)[keyof typeof Skill]
+
 export const DisasterType = {
   FLOOD: 'flood',
   EARTHQUAKE: 'earthquake',

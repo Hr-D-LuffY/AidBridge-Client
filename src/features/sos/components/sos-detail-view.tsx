@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { PageHeader } from '@/components/shared/page-header'
 import { ReliefBadges } from '@/components/shared/relief-category'
+import { RequestedSkills } from '@/components/shared/skill-chips'
 import { PriorityBadge, StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
 import { ChatPanel } from '@/features/message/components/chat-panel'
@@ -148,6 +149,7 @@ export function SosDetailView({ id }: SosDetailViewProps) {
 
           <Panel title="What you asked for">
             <ReliefBadges categories={sos.needs} />
+            <RequestedSkills skills={sos.requiredSkills} />
             {sos.description ? (
               <p className="text-pretty whitespace-pre-line">{sos.description}</p>
             ) : (

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { nameField, newPasswordSchema } from '@/features/auth/auth.schema'
 import { PASSWORD_MAX_LENGTH, PHONE_PATTERN } from '@/lib/constants'
+import { LANGUAGE_MAX_LENGTH, LANGUAGE_MIN_LENGTH } from '@/lib/skills'
 import type { UpdateProfilePayload, UserProfile } from '@/types'
 
 // The details form. Phone stays plain text here (blank allowed for an account that never had one).
@@ -39,6 +40,14 @@ export function toProfileChanges(
   if (phone !== '' && phone !== (profile.phone ?? '')) changes.phone = phone
   return changes
 }
+
+// One language a volunteer speaks: free text, 2-30 characters (the backend trims and keeps it once per
+// spelling, ignoring case).
+export const languageSchema = z
+  .string()
+  .trim()
+  .min(LANGUAGE_MIN_LENGTH, `A language needs at least ${LANGUAGE_MIN_LENGTH} letters`)
+  .max(LANGUAGE_MAX_LENGTH, `A language can have at most ${LANGUAGE_MAX_LENGTH} characters`)
 
 // The old password only has to be present (it is checked by the backend); the new one follows the
 // password policy and must differ.
